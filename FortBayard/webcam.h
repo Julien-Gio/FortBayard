@@ -12,9 +12,9 @@ using namespace cv;
 
 class Webcam
 {
-    QLabel* infoLabel, *imageLabel;
-    std::thread* th;
-    cv::VideoCapture * webCam_;
+    QLabel* infoLabel, *imageLabel; // Association
+    std::thread* th; // Composition
+    cv::VideoCapture * webCam_; // Composition
 
     void updateCamera();
 public:
