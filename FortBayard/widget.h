@@ -21,13 +21,13 @@ class Widget : public QWidget
 public:
     explicit Widget(QWidget *parent = 0);
     ~Widget();
+    void keyPressEvent(QKeyEvent *event);
 
 private:
     Ui::Widget *ui;
     Webcam* webcamThread;
 
 private slots:
-    void on_captureButton__clicked();
 };
 
 #endif // WIDGET_H

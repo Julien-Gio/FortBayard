@@ -13,10 +13,12 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
+        minimap.cpp \
         webcam.cpp \
         widget.cpp
 
 HEADERS  += widget.h \
+    minimap.h \
     webcam.h
 
 FORMS    += widget.ui

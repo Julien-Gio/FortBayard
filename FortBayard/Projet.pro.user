@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.11.1, 2020-02-27T17:45:57. -->
+<!-- Written by QtCreator 4.11.1, 2020-03-09T14:09:37. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -287,8 +287,9 @@
     </valuelist>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:C:/Users/quent/OneDrive/Documents/Cours/Semestre 8/Projet bibliothèque de dev/Projet/Projet.pro</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">C:/Users/quent/OneDrive/Documents/Cours/Semestre 8/Projet bibliothèque de dev/Projet/Projet.pro</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Projet2</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:C:/Users/quent/OneDrive/Documents/Cours/Semestre 8/Projet bibliothèque de dev/Projet/FortBayard/FortBayard/Projet.pro</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">C:/Users/quent/OneDrive/Documents/Cours/Semestre 8/Projet bibliothèque de dev/Projet/FortBayard/FortBayard/Projet.pro</value>
     <value type="QString" key="RunConfiguration.Arguments"></value>
     <value type="bool" key="RunConfiguration.Arguments.multi">false</value>
     <value type="QString" key="RunConfiguration.OverrideDebuggerStartup"></value>

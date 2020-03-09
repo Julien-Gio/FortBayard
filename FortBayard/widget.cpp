@@ -2,6 +2,7 @@
 #include "widget.h"
 #include "ui_widget.h"
 #include <QString>
+#include <iostream>
 
 using namespace cv;
 
@@ -20,7 +21,25 @@ Widget::~Widget()
     delete ui;
 }
 
-void Widget::on_captureButton__clicked()
-{
-
+void Widget::keyPressEvent(QKeyEvent *event){
+    switch (event->key()) {
+    case Qt::Key_D:
+        ui->scrollAreaWidgetContents->setRotation(ui->scrollAreaWidgetContents->getRotation()+2 * 3.14159/180);
+        if(!ui->scrollArea->isHidden())
+            ui->scrollAreaWidgetContents->update();
+        break;
+    case Qt::Key_Q:
+        ui->scrollAreaWidgetContents->setRotation(ui->scrollAreaWidgetContents->getRotation()-2 * 3.14159/180);
+        if(!ui->scrollArea->isHidden())
+            ui->scrollAreaWidgetContents->update();
+        break;
+    case Qt::Key_R:
+        if(ui->scrollArea->isHidden()){
+            ui->scrollAreaWidgetContents->update();
+            ui->scrollArea->show();
+        }
+        else
+            ui->scrollArea->hide();
+        break;
+    }
 }
