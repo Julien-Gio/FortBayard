@@ -6,6 +6,7 @@
 #include <iostream>
 #include <mutex>
 #include "webcam.h"
+#include <QGLWidget>
 
 using namespace std;
 
@@ -15,7 +16,7 @@ namespace Ui {
 class Widget;
 }
 
-class Widget : public QWidget
+class Widget : public QGLWidget
 {
     Q_OBJECT
 public:

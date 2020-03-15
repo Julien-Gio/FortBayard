@@ -4,13 +4,24 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui opengl widgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = TestWebCamQt
 TEMPLATE = app
 
+# ajout des libs au linker
+win32 {
+    win32-msvc* {
+        LIBS     += opengl32.lib glu32.lib
+    } else {
+        LIBS     += -lopengl32 -lglu32
+    }
+}
+else {
+        LIBS     += -lGL -lGLU
+}
 
 SOURCES += main.cpp\
         minimap.cpp \
@@ -21,7 +32,7 @@ HEADERS  += widget.h \
     minimap.h \
     webcam.h
 
-FORMS    += widget.ui
+FORMS    +=
 
 INCLUDEPATH +=$$(OPENCV_DIR)\..\..\include
 
