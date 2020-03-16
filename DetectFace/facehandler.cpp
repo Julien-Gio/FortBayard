@@ -20,7 +20,7 @@ FaceHandler::FaceHandler() :
     }
 
     // Detection de faces
-    if(!face_cascade.load("../TestDetectMotion/haarcascade_frontalface_alt.xml")) {
+    if(!face_cascade.load("../DetectFace/haarcascade_frontalface_alt.xml")) {
         cerr << "Error loading haarcascade"<< endl;
         return;
     }
