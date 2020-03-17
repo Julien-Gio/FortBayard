@@ -101,7 +101,6 @@ void FaceHandler::update() {
 
     // Display frame2
     imshow("WebCam", frame2);
-
 }
 
 
@@ -135,6 +134,9 @@ void FaceHandler::update_C(Rect& face) {
     Point p(faceCenter.x+vect.x, faceCenter.y+vect.y);
     arrowedLine(frame2, faceCenter, p, Scalar(255, 255, 255), 2);
 
+    // Draw template in face
+    rectangle(frame2, Rect(average_face.x + maxLoc.x, average_face.y + maxLoc.y, 8, 8), Scalar(200, 0, 200), 3);
+
     // Draw the direction
     forward_mvmt += vect.y;
     side_mvmt += vect.x;
@@ -156,15 +158,14 @@ void FaceHandler::update_J(Rect& face) {
 
     // Draw yellow rectangle
     rectangle(frame2, average_face, Scalar(0, 200, 220), 2);
-
-    // Swap matrixes
-    swap(frameRect1, frameRect2);
 }
 
 
 void FaceHandler::update_N(Rect& face) {
-    // Draw red rectangle
+    // Draw red rectangles
     rectangle(frame2, Rect(10, 10, 10, 10), Scalar(0, 0, 250), 2);
+    rectangle(frame2, Rect(25, 10, 10, 10), Scalar(0, 0, 250), 2);
+    rectangle(frame2, Rect(40, 10, 10, 10), Scalar(0, 0, 250), 2);
 }
 
 
