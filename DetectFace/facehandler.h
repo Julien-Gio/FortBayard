@@ -51,12 +51,19 @@ class FaceHandler {
     Rect templateRect;
     Point workingCenter;
 
+    Mat resultImage;    // to store the matchTemplate result
+
+    Mat frame1,frame2,frameRect1,frameRect2;
+
 public:
     FaceHandler();
 
     void update();
 
 private:
+    void update_C(Rect& face);
+    void update_J(Rect& face);
+    void update_N(Rect& face);
     Rect getFace(Mat* frame_gray);
     Rect getAverageFace();
 

@@ -26,11 +26,26 @@ FaceHandler::FaceHandler() :
     }
 
     cout << "FaceHandler created." << endl;
+
+//    // Get frame1
+//    cap >> frame1;
+//    // Mirror effect
+//    cv::flip(frame1,frame1,1);
+//    // Extract rect1 and convert to gray
+//    cv::cvtColor(Mat(frame1, workingRect), frameRect1, COLOR_BGR2GRAY);
+//    //Mat(frame1,rect).copyTo(frameRect1);
+
+//    // Create the matchTemplate image result
+//    int result_cols =  frame1.cols-templateWidth  + 1;
+//    int result_rows = frame1.rows-templateHeight + 1;
+//    resultImage.create( result_cols, result_rows, CV_32FC1 );
+
+    // Init output window
+    namedWindow("WebCam", 1);
 }
 
 
 void FaceHandler::update() {
-    Mat frame1,frame2,frameRect1,frameRect2;
     // Get frame2
     cap >> frame2;
     // Mirror effect
@@ -40,66 +55,116 @@ void FaceHandler::update() {
     Mat frame_gray;
     // Convert to gray
     cv::cvtColor(frame2, frame_gray, COLOR_BGR2GRAY);
-
     Rect face = getFace(&frame_gray);
 
-    if (face.width > 0) {
 
-        // Pour toujours avec une nombre constant de faces, enlever une face puis la remplacer avec la plus récente
-        faces.emplace_back(face);
-
-        if (faces.size() < NUM_AVG_OVER_FRAMES) {
-            faces.erase(faces.begin());
-
-
-            Rect average_face = getAverageFace();
-
-            // Draw green rectangle
-            rectangle(frame2, average_face, Scalar(0,255,0), 2);
-
-            // Detect Motion //
-            // Extract working rect in frame2 and convert to gray
-            cv::cvtColor(Mat(frame2, average_face), frameRect2, COLOR_BGR2GRAY);
-
-            // Extract template image in frame1
-            Mat templateImage(frameRect1, templateRect);
-
-            // Create the matchTemplate image result
-            Mat resultImage;    // to store the matchTemplate result
-            int result_cols =  frame1.cols-templateWidth  + 1;
-            int result_rows = frame1.rows-templateHeight + 1;
-            resultImage.create(result_cols, result_rows, CV_32FC1);
-            // Do the Matching between the working rect in frame2 and the templateImage in frame1
-            matchTemplate(frameRect2, templateImage, resultImage, TM_CCORR_NORMED);
-
-            // Localize the best match with minMaxLoc
-            double minVal; double maxVal; Point minLoc; Point maxLoc;
-            minMaxLoc(resultImage, &minVal, &maxVal, &minLoc, &maxLoc);
-
-            // Compute the translation vector between the origin and the matching rect
-            Point vect(maxLoc.x-templateRect.x, maxLoc.y-templateRect.y);
-
-            // Draw green rectangle and the translation vector
-            rectangle(frame2, average_face, Scalar(0, 255, 0), 2);
-            Point faceCenter(average_face.x + average_face.width / 2, average_face.y + average_face.height / 2);
-            Point p(faceCenter.x+vect.x, faceCenter.y+vect.y);
-            arrowedLine(frame2, faceCenter, p, Scalar(255, 255, 255), 2);
-
-            // Draw the direction
-            forward_mvmt += vect.y;
-            side_mvmt += vect.x;
-            std::cout << vect.x << " " << vect.y << std::endl;
-            Point dirCenter(frameWidth / 2, frameHeight - 20);
-            Point dirEdge(dirCenter.x + side_mvmt, dirCenter.y + forward_mvmt);
-            arrowedLine(frame2, dirCenter, dirEdge, Scalar(0, 0, 255), 3);
-
-            // Swap matrixes
-            swap(frameRect1, frameRect2);
+    switch (state) {
+    case 'C':
+        if (face.width <= 0) {
+            // Pas de visage
+            state = 'N';
+        } else {
+            update_C(face);
         }
+        break;
+    case 'J':
+        if (face.width <= 0) {
+            // Pas de visage
+            state = 'N';
+        } else if (faces.size() == NUM_AVG_OVER_FRAMES) {
+            // Nous avons stabilisé
+            // 1) Récupérer l'image de référence
+            cv::cvtColor(Mat(frame2, workingRect), frameRect1, COLOR_BGR2GRAY);
+            int result_cols = frame2.cols - templateWidth  + 1;
+            int result_rows = frame2.rows - templateHeight + 1;
+            resultImage.create(result_cols, result_rows, CV_32FC1);
+
+            // 2) Reset mouvement
+            forward_mvmt = 0;
+            side_mvmt = 0;
+
+            // 3) Passer en mode continue
+            state = 'C';
+        } else {
+            update_J(face);
+        }
+        break;
+    case 'N':
+        if (face.width > 0) {
+            faces.clear();
+            state = 'J';
+        } else {
+            update_N(face);
+        }
+        break;
     }
 
     // Display frame2
     imshow("WebCam", frame2);
+
+}
+
+
+void FaceHandler::update_C(Rect& face) {
+    // Pour toujours avec une nombre constant de faces, enlever une face puis la remplacer avec la plus récente
+    faces.emplace_back(face);
+    faces.erase(faces.begin());
+
+    Rect average_face = getAverageFace();
+
+    // Detect Motion //
+    // Extract working rect in frame2 and convert to gray
+    cv::cvtColor(Mat(frame2, average_face), frameRect2, COLOR_BGR2GRAY);
+
+    // Extract template image in frame1
+    Mat templateImage(frameRect1, templateRect);
+
+    // Do the Matching between the working rect in frame2 and the templateImage in frame1
+    matchTemplate(frameRect2, templateImage, resultImage, TM_CCORR_NORMED);
+
+    // Localize the best match with minMaxLoc
+    double minVal; double maxVal; Point minLoc; Point maxLoc;
+    minMaxLoc(resultImage, &minVal, &maxVal, &minLoc, &maxLoc);
+
+    // Compute the translation vector between the origin and the matching rect
+    Point vect(maxLoc.x-templateRect.x, maxLoc.y-templateRect.y);
+
+    // Draw green rectangle and the translation vector
+    rectangle(frame2, average_face, Scalar(0, 255, 0), 2);
+    Point faceCenter(average_face.x + average_face.width / 2, average_face.y + average_face.height / 2);
+    Point p(faceCenter.x+vect.x, faceCenter.y+vect.y);
+    arrowedLine(frame2, faceCenter, p, Scalar(255, 255, 255), 2);
+
+    // Draw the direction
+    forward_mvmt += vect.y;
+    side_mvmt += vect.x;
+    //std::cout << vect.x << " " << vect.y << std::endl;
+    Point dirCenter(frameWidth / 2, frameHeight - 20);
+    Point dirEdge(dirCenter.x + side_mvmt, dirCenter.y + forward_mvmt);
+    arrowedLine(frame2, dirCenter, dirEdge, Scalar(0, 0, 255), 3);
+
+    // Swap matrixes
+    swap(frameRect1, frameRect2);
+}
+
+
+void FaceHandler::update_J(Rect& face) {
+    // Ajouter la face à notre buffer
+    faces.emplace_back(face);
+
+    Rect average_face = getAverageFace();
+
+    // Draw yellow rectangle
+    rectangle(frame2, average_face, Scalar(0, 200, 220), 2);
+
+    // Swap matrixes
+    swap(frameRect1, frameRect2);
+}
+
+
+void FaceHandler::update_N(Rect& face) {
+    // Draw red rectangle
+    rectangle(frame2, Rect(10, 10, 10, 10), Scalar(0, 0, 250), 2);
 }
 
 
