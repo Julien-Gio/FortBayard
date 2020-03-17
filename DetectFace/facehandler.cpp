@@ -27,18 +27,11 @@ FaceHandler::FaceHandler() :
 
     cout << "FaceHandler created." << endl;
 
-//    // Get frame1
-//    cap >> frame1;
-//    // Mirror effect
-//    cv::flip(frame1,frame1,1);
-//    // Extract rect1 and convert to gray
-//    cv::cvtColor(Mat(frame1, workingRect), frameRect1, COLOR_BGR2GRAY);
-//    //Mat(frame1,rect).copyTo(frameRect1);
-
-//    // Create the matchTemplate image result
-//    int result_cols =  frame1.cols-templateWidth  + 1;
-//    int result_rows = frame1.rows-templateHeight + 1;
-//    resultImage.create( result_cols, result_rows, CV_32FC1 );
+    // resultImage stocke la resultat de la Xcor entre l'image et le tamplate.
+    // Sa taille est donc cette d'une frame avec la moitier du template en haut, en bas, a gauche et a droite
+    int result_cols = frameWidth - templateWidth  + 1;
+    int result_rows = frameHeight - templateHeight + 1;
+    resultImage.create(result_cols, result_rows, CV_32FC1);
 
     // Init output window
     namedWindow("WebCam", 1);
@@ -75,9 +68,6 @@ void FaceHandler::update() {
             // Nous avons stabilisé
             // 1) Récupérer l'image de référence
             cv::cvtColor(Mat(frame2, workingRect), frameRect1, COLOR_BGR2GRAY);
-            int result_cols = frame2.cols - templateWidth  + 1;
-            int result_rows = frame2.rows - templateHeight + 1;
-            resultImage.create(result_cols, result_rows, CV_32FC1);
 
             // 2) Reset mouvement
             forward_mvmt = 0;
