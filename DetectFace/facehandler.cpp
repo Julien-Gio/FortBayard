@@ -33,11 +33,7 @@ FaceHandler::FaceHandler() :
 
     cout << "FaceHandler created." << endl;
 
-    // resultImage stocke la resultat de la Xcor entre l'image et le tamplate.
-    // Sa taille est donc cette d'une frame avec la moitier du template en haut, en bas, a gauche et a droite
-    int result_cols = frameWidth - templateWidth  + 1;
-    int result_rows = frameHeight - templateHeight + 1;
-    resultImage.create(result_cols, result_rows, CV_32FC1);
+
 
     // Init output window
     namedWindow("WebCam", 1);
@@ -75,11 +71,12 @@ void FaceHandler::update() {
             // 1) Récupérer l'image de référence
             Rect average_face = getAverageFace();
             cv::cvtColor(Mat(frame2, average_face), frameRect1, COLOR_BGR2GRAY);
-            templateRect.x = average_face.width /2 - templateWidth / 2;
-            templateRect.y = average_face.height /2 - templateHeight / 2;
-            templateRect.width = templateWidth;
-            templateRect.height = templateHeight;
+            templateRect.width = (average_face.width * templateWidth);
+            templateRect.height = (average_face.height * templateHeight);
+            templateRect.x = average_face.width / 2 - templateRect.width / 2 + (average_face.width * templateOffsetX);
+            templateRect.y = average_face.height / 2 - templateRect.height / 2 + (average_face.height * templateOffsetY);
             templateImage = Mat(frameRect1, templateRect);
+
             // 2) Reset mouvement
             forward_mvmt = 0;
             side_mvmt = 0;
@@ -119,6 +116,14 @@ void FaceHandler::update_C(Rect& face) {
     // Extract template image in frame1
     //Mat templateImage(frameRect1, templateRect);
 
+    // resultImage stocke la resultat de la Xcor entre l et le tamplate.
+    // Sa taille est donc cette d'une frame moins la moitier du template en haut, en bas, à gauche et à droite
+    int result_cols = frameRect2.cols - templateImage.cols + 1;
+    int result_rows = frameRect2.rows - templateImage.rows + 1;
+    resultImage.create(result_cols, result_rows, CV_32FC1);
+    cout << "corr:" << resultImage.rows << " " << resultImage.cols << endl;
+    cout << "img:" << frameRect2.rows << " " << frameRect2.cols << endl;
+    cout << "templ:" << templateImage.rows << " " << templateImage.cols << endl;
     // Do the Matching between the working rect in frame2 and the templateImage in frame1
     matchTemplate(frameRect2, templateImage, resultImage, TM_CCORR_NORMED);
 
@@ -129,8 +134,10 @@ void FaceHandler::update_C(Rect& face) {
     // Compute the translation vector between the origin and the matching rect
     Point vect(maxLoc.x-templateRect.x, maxLoc.y-templateRect.y);
     // Draw the direction
-    forward_mvmt += vect.y;
-    side_mvmt += vect.x;
+    if (abs(vect.y) >= SEUIL)
+        forward_mvmt += vect.y;
+    if (abs(vect.x) >= SEUIL)
+        side_mvmt += vect.x;
 
     // Green rect around face
     rectangle(frame2, average_face, Scalar(0, 255, 0), 2);
@@ -183,9 +190,9 @@ Rect FaceHandler::getFace(Mat* frame_gray) {
 
     std::vector<int> rejectLevels;
     std::vector<double> levelWeights;
-
+cout << "ee" << endl;
     face_cascade.detectMultiScale(*frame_gray, faces, rejectLevels, levelWeights, 1.1, 3, 0, Size(60, 60), Size(), true); //, 0, Size(60, 60), Size(300, 300));
-
+cout << "oo" << endl;
     if (faces.size() > 0) {
         return faces[0];
     } else {
