@@ -1,4 +1,5 @@
 #include "player.h"
+#include <iostream>
 
 Player::Player()
 {
@@ -19,19 +20,20 @@ void Player::rotate(float r){
 void Player::walk(float w){
     posX += w * std::cos(yRotation);
     posY += w * std::sin(yRotation);
+    std::cout<<posX<<"   "<<posY<<std::endl;
 }
 
 float Player::getRotation(){
     return yRotation;
 }
 
-void Player::drawPlayer(QPainter * painter){
-    painter->setBrush(Qt::blue);
-    painter->setPen(QPen(Qt::blue, 2));
-    const float size = 10;
-    float mapPosX = posX + 10, mapPosY = posY + 10;
+void Player::drawPlayer(QPainter * painter, float sizeOfCase, QPoint offset){
+    painter->setBrush(Qt::green);
+    painter->setPen(QPen(Qt::green, sizeOfCase/5));
+    const float size = sizeOfCase /2;
+    const float mapPosX = posX*sizeOfCase + offset.rx(), mapPosY = posY*sizeOfCase + offset.ry();
     painter->drawEllipse(mapPosX - size/2, mapPosY - size/2, size, size);
 
-    const float length = 13;
+    const float length = size * 1.3;
     painter->drawLine(mapPosX, mapPosY, mapPosX + length * cos(yRotation), mapPosY + length * sin(yRotation));
 }

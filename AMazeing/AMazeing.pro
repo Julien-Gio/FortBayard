@@ -31,7 +31,6 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     maze.cpp \
-    minimap.cpp \
     myglwidget.cpp \
     player.cpp
 
@@ -39,7 +38,6 @@ HEADERS += \
     cell.h \
     mainwindow.h \
     maze.h \
-    minimap.h \
     myglwidget.h \
     player.h
 

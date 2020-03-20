@@ -72,16 +72,16 @@ void Maze::display(){
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, gray);
     glBegin(GL_QUADS);
         glNormal3f(0, 1, 0);
-        glVertex3f(-width_/2 * sizeByRoom, 0, -height_/2 * sizeByRoom); // Sol
-        glVertex3f(-width_/2 * sizeByRoom, 0, height_/2 * sizeByRoom);
-        glVertex3f(width_/2 * sizeByRoom, 0, height_/2 * sizeByRoom);
-        glVertex3f(width_/2 * sizeByRoom, 0, -height_/2 * sizeByRoom);
+        glVertex3f(0, 0, 0); // Sol
+        glVertex3f(0, 0, height_ * sizeByRoom);
+        glVertex3f(width_ * sizeByRoom, 0, height_ * sizeByRoom);
+        glVertex3f(width_ * sizeByRoom, 0, 0);
 
         glNormal3f(0, -1, 0);
-        glVertex3f(-width_/2 * sizeByRoom, wallHeight, -height_/2 * sizeByRoom); // Plafond
-        glVertex3f(-width_/2 * sizeByRoom, wallHeight, height_/2 * sizeByRoom);
-        glVertex3f(width_/2 * sizeByRoom, wallHeight, height_/2 * sizeByRoom);
-        glVertex3f(width_/2 * sizeByRoom, wallHeight, -height_/2 * sizeByRoom);
+        glVertex3f(0, wallHeight, 0); // Plafond
+        glVertex3f(0, wallHeight, height_ * sizeByRoom);
+        glVertex3f(width_ * sizeByRoom, wallHeight, height_ * sizeByRoom);
+        glVertex3f(width_ * sizeByRoom, wallHeight, 0);
     glEnd();
 
     float green[4] = {100.f/255, 200.f/255, 150.f/255, 1};
@@ -89,17 +89,17 @@ void Maze::display(){
     /*Les murs du labyrinthe*/
     for (unsigned int i=0;i<height_;i++) {
         if(grid_[i][0].isFrontier(Cell::W))
-            drawHorizontalWall(QPoint(- width_/2, i - height_/2), QPoint(- width_/2, i-height_/2 + 1));
+            drawHorizontalWall(QPoint(0, i), QPoint(0, i + 1));
         for (unsigned int j=0;j<width_;j++) {
             if (grid_[i][j].isFrontier(Cell::E))
-                drawHorizontalWall(QPoint(j - width_/2 + 1, i - height_/2), QPoint(j - width_/2 + 1, i - height_/2 + 1));
+                drawHorizontalWall(QPoint(j + 1, i), QPoint(j + 1, i + 1));
             if (grid_[i][j].isFrontier(Cell::S))
-                drawVerticalWall(QPoint(j - width_/2, i - height_/2 + 1), QPoint(j - width_/2 + 1, i - height_/2 + 1));
+                drawVerticalWall(QPoint(j, i + 1), QPoint(j + 1, i + 1));
         }
     }
     for (unsigned int j=0;j<width_;j++) {
         if (grid_[0][j].isFrontier(Cell::N))
-            drawVerticalWall(QPoint(j - width_/2, - height_/2), QPoint(j - width_/2 + 1, - height_/2));
+            drawVerticalWall(QPoint(j, 0), QPoint(j + 1, 0));
     }
 }
 
@@ -197,5 +197,25 @@ void Maze::generate()
 
         // Mark the cell and add the frontier cells to the list
         mark(f,frontier);
+    }
+}
+
+void Maze::drawMap(QPainter *painter, float sizeOfCase, QPoint offset){
+    painter->fillRect(offset.rx(), offset.ry(), sizeOfCase * width_, sizeOfCase * height_, QBrush(QColor(0, 0, 0, 120)));
+    painter->setBrush(Qt::white);
+    painter->setPen(QPen(Qt::white, 2));
+    for (unsigned int i=0;i<height_;i++) {
+        if(grid_[i][0].isFrontier(Cell::W))
+            painter->drawLine(sizeOfCase*QPoint(0, i) + offset, sizeOfCase*QPoint(0, i + 1) + offset);
+        for (unsigned int j=0;j<width_;j++) {
+            if (grid_[i][j].isFrontier(Cell::E))
+               painter->drawLine(sizeOfCase*QPoint(j + 1, i) + offset, sizeOfCase*QPoint(j + 1, i + 1) + offset);
+            if (grid_[i][j].isFrontier(Cell::S))
+                painter->drawLine(sizeOfCase*QPoint(j, i + 1) + offset, sizeOfCase*QPoint(j + 1, i + 1) + offset);
+        }
+    }
+    for (unsigned int j=0;j<width_;j++) {
+        if (grid_[0][j].isFrontier(Cell::N))
+            painter->drawLine(sizeOfCase*QPoint(j, 0) + offset, sizeOfCase*QPoint(j + 1, 0) + offset);
     }
 }

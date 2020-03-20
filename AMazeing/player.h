@@ -20,7 +20,7 @@ public:
     void rotate(float);
     void walk(float);
     float getRotation();
-    void drawPlayer(QPainter *);
+    void drawPlayer(QPainter *, float sizeOfCase, QPoint offset);
 };
 
 #endif // PLAYER_H

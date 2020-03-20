@@ -20,6 +20,7 @@ class MyGLWidget : public QGLWidget
 
     Maze maze;
     Player player;
+    const float sizeOfCaseOnMap = 30; // Value in pixel
 
 public:
     MyGLWidget(QWidget *parent = 0);

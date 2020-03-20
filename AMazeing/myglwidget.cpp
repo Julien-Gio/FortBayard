@@ -75,7 +75,8 @@ void MyGLWidget::paintEvent(QPaintEvent *event)
     glPopMatrix();
 
     QPainter painter(this);
-    player.drawPlayer(&painter);
+    maze.drawMap(&painter, sizeOfCaseOnMap, QPoint(10, 10));
+    player.drawPlayer(&painter, sizeOfCaseOnMap/maze.getSizeOfRoom(), QPoint(10, 10));
     painter.end();
 }
 

@@ -16,6 +16,7 @@
 #include <qopengl.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <QPainter>
 
 using namespace std;
 
@@ -41,9 +42,13 @@ public:
     Maze(int width = 10, int height = 10);
     void reinit();
     void display();
+    void generate();
+    void drawMap(QPainter*, float, QPoint offset);
+    float getSizeOfRoom(){return sizeByRoom;}
+
+private:
     void drawVerticalWall(QPoint, QPoint);
     void drawHorizontalWall(QPoint, QPoint);
-    void generate();
 };
 
 #endif // MAZE_H
