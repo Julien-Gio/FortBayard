@@ -73,7 +73,12 @@ void FaceHandler::update() {
         } else if (faces.size() == NUM_AVG_OVER_FRAMES) {
             // Nous avons stabilisé
             // 1) Récupérer l'image de référence
-            cv::cvtColor(Mat(frame2, workingRect), frameRect1, COLOR_BGR2GRAY);
+            Rect average_face = getAverageFace();
+            cv::cvtColor(Mat(frame2, average_face), frameRect1, COLOR_BGR2GRAY);
+            templateRect.x = average_face.width /2 - templateWidth / 2;
+            templateRect.y = average_face.height /2 - templateHeight / 2;
+            templateRect.width = templateWidth;
+            templateRect.height = templateHeight;
             templateImage = Mat(frameRect1, templateRect);
             // 2) Reset mouvement
             forward_mvmt = 0;
@@ -139,7 +144,7 @@ void FaceHandler::update_C(Rect& face) {
         // Draw template in face
         //cout << maxLoc.x << ", " << maxLoc.y << endl;
         rectangle(frame2, Rect(average_face.x + maxLoc.x, average_face.y + maxLoc.y, 8, 8), Scalar(200, 0, 200), 3);
-        Rect blackSquare(workingRect.x + templateRect.x, workingRect.y + templateRect.y, templateRect.width, templateRect.height);
+        Rect blackSquare(average_face.x + templateRect.x, average_face.y + templateRect.y, templateRect.width, templateRect.height);
         rectangle(frame2, blackSquare, Scalar(0, 0, 0), 2);
         rectangle(frame2, workingRect, Scalar(230, 40, 40), 2);
 
