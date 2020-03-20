@@ -1,22 +1,18 @@
 #include "facehandler.h"
 
 FaceHandler::FaceHandler() :
-    cap(0),
-    workingRect((frameWidth-subImageWidth)/2, frameHeight/2+(frameHeight/2-subImageHeight)/2, subImageWidth, subImageHeight),
-    templateRect((workingRect.width-templateWidth)/2, (workingRect.height-templateHeight)/2, templateWidth, templateHeight),
-    workingCenter(workingRect.x+subImageWidth/2, workingRect.y+subImageHeight/2) {
-
+    cap(0) {
     cout << "===================================" << endl;
     cout << "          START OF PROGRAM         " << endl;
     cout << "===================================" << endl;
     cout << "D to toggle debugging graphics." << endl;
-    cout << "Escape to quit." << endl;
+    cout << "Escape to quit." << endl << endl;
 
     state = 'N';
 
 
-    cout << "width :" << cap.get(CAP_PROP_FRAME_WIDTH) << endl;
-    cout << "height :" << cap.get(CAP_PROP_FRAME_HEIGHT) << endl;
+    cout << "Frame width :" << cap.get(CAP_PROP_FRAME_WIDTH) << endl;
+    cout << "Frame height :" << cap.get(CAP_PROP_FRAME_HEIGHT) << endl;
     cap.set(CAP_PROP_FRAME_WIDTH,frameWidth);
     cap.set(CAP_PROP_FRAME_HEIGHT,frameHeight);
     if(!cap.isOpened())  // check if we succeeded
@@ -31,10 +27,6 @@ FaceHandler::FaceHandler() :
         return;
     }
 
-    cout << "FaceHandler created." << endl;
-
-
-
     // Init output window
     namedWindow("WebCam", 1);
 }
@@ -42,14 +34,14 @@ FaceHandler::FaceHandler() :
 
 void FaceHandler::update() {
     // Get frame2
-    cap >> frame2;
+    cap >> frame;
     // Mirror effect
-    cv::flip(frame2, frame2, 1);
+    cv::flip(frame, frame, 1);
 
     // Detect Faces //
-    Mat frame_gray;
     // Convert to gray
-    cv::cvtColor(frame2, frame_gray, COLOR_BGR2GRAY);
+    Mat frame_gray;
+    cv::cvtColor(frame, frame_gray, COLOR_BGR2GRAY);
     Rect face = getFace(&frame_gray);
 
 
@@ -70,14 +62,15 @@ void FaceHandler::update() {
             // Nous avons stabilisé
             // 1) Récupérer l'image de référence
             Rect average_face = getAverageFace();
-            cv::cvtColor(Mat(frame2, average_face), frameRect1, COLOR_BGR2GRAY);
+            Mat faceMat;
+            cv::cvtColor(Mat(frame, average_face), faceMat, COLOR_BGR2GRAY);
             templateRect.width = (average_face.width * templateWidth);
             templateRect.height = (average_face.height * templateHeight);
             templateRect.x = average_face.width / 2 - templateRect.width / 2 + (average_face.width * templateOffsetX);
             templateRect.y = average_face.height / 2 - templateRect.height / 2 + (average_face.height * templateOffsetY);
-            templateImage = Mat(frameRect1, templateRect);
+            templateImage = Mat(faceMat, templateRect);
 
-            // 3) Passer en mode continue
+            // 2) Passer en mode continue
             state = 'C';
         } else {
             update_J(face);
@@ -94,39 +87,36 @@ void FaceHandler::update() {
     }
 
     // Display frame2
-    imshow("WebCam", frame2);
+    imshow("WebCam", frame);
 }
 
 
 void FaceHandler::update_C(Rect& face) {
-    // Pour toujours avec une nombre constant de faces, enlever une face puis la remplacer avec la plus récente
-    faces.emplace_back(face);
+    // Pour toujours avoir un nombre constant de faces, enlever une face puis la remplacer avec la plus récente
     faces.erase(faces.begin());
+    faces.emplace_back(face);
 
     Rect average_face = getAverageFace();
 
     // Detect Motion //
     // Extract working rect in frame2 and convert to gray
-    cv::cvtColor(Mat(frame2, average_face), frameRect2, COLOR_BGR2GRAY);
-
-    // Extract template image in frame1
-    //Mat templateImage(frameRect1, templateRect);
+    cv::cvtColor(Mat(frame, average_face), frameRect, COLOR_BGR2GRAY);
 
     // resultImage stocke la resultat de la Xcor entre l et le tamplate.
     // Sa taille est donc cette d'une frame moins la moitier du template en haut, en bas, à gauche et à droite
-    int result_cols = frameRect2.cols - templateImage.cols + 1;
-    int result_rows = frameRect2.rows - templateImage.rows + 1;
+    int result_cols = frameRect.cols - templateImage.cols + 1;
+    int result_rows = frameRect.rows - templateImage.rows + 1;
     resultImage.create(result_cols, result_rows, CV_32FC1);
 
-    // Do the Matching between the working rect in frame2 and the templateImage in frame1
-    matchTemplate(frameRect2, templateImage, resultImage, TM_CCORR_NORMED);
+    // Do the Matching between the face and the template
+    matchTemplate(frameRect, templateImage, resultImage, TM_CCORR_NORMED);
 
     // Localize the best match with minMaxLoc
     double minVal; double maxVal; Point minLoc; Point maxLoc;
     minMaxLoc(resultImage, &minVal, &maxVal, &minLoc, &maxLoc);
 
     // Compute the translation vector between the origin and the matching rect
-    Point vect(maxLoc.x-templateRect.x, maxLoc.y-templateRect.y);
+    Point vect(maxLoc.x - templateRect.x, maxLoc.y - templateRect.y);
 
     // Get the direction
     Point dir(0, 0);
@@ -142,34 +132,28 @@ void FaceHandler::update_C(Rect& face) {
     // Draw the direction
     Point dirCenter(frameWidth / 2, frameHeight - 40);
     Point dirEdge(dirCenter.x + dir.x * 45, dirCenter.y + dir.y * 35);
-    arrowedLine(frame2, dirCenter, dirEdge, Scalar(0, 0, 255), 5);
+    arrowedLine(frame, dirCenter, dirEdge, Scalar(0, 0, 255), 5);
 
     if (debug_graphics) {
-
         // GREEN RECT : face
-        rectangle(frame2, average_face, Scalar(0, 255, 0), 2);
+        rectangle(frame, average_face, Scalar(0, 255, 0), 2);
 
         // Draw the translation vector
         Point faceCenter(average_face.x + average_face.width / 2, average_face.y + average_face.height / 2);
         Point p(faceCenter.x + vect.x, faceCenter.y + vect.y);
-        arrowedLine(frame2, faceCenter, p, Scalar(255, 255, 255), 2);
-
-        // BLUE RECT : working rect
-        rectangle(frame2, workingRect, Scalar(230, 40, 40), 2);
+        arrowedLine(frame, faceCenter, p, Scalar(255, 255, 255), 2);
 
         // BLACK RECT : template rect
         Rect blackSquare(average_face.x + templateRect.x, average_face.y + templateRect.y,
                          templateRect.width, templateRect.height);
-        rectangle(frame2, blackSquare, Scalar(0, 0, 0), 2);
+        rectangle(frame, blackSquare, Scalar(0, 0, 0), 2);
 
         // PURPLE DOT : center of result
-        rectangle(frame2, Rect(average_face.x + templateRect.width / 2 + maxLoc.x,
-                               average_face.y + templateRect.height + maxLoc.y, 5, 5),
+        rectangle(frame, Rect(average_face.x + templateRect.width / 2 + maxLoc.x,
+                               average_face.y + templateRect.height / 2 + maxLoc.y, 5, 5),
                   Scalar(230, 0, 230), 3);
     }
 
-    // Swap matrixes
-    //swap(frameRect1, frameRect2);
 }
 
 
@@ -181,16 +165,16 @@ void FaceHandler::update_J(Rect& face) {
 
     if (debug_graphics) {
         // Draw yellow rectangle
-        rectangle(frame2, average_face, Scalar(0, 200, 220), 2);
+        rectangle(frame, average_face, Scalar(0, 200, 220), 2);
     }
 }
 
 
 void FaceHandler::update_N(Rect& face) {
     // Draw red rectangles
-    rectangle(frame2, Rect(10, 10, 10, 10), Scalar(0, 0, 250), 2);
-    rectangle(frame2, Rect(25, 10, 10, 10), Scalar(0, 0, 250), 2);
-    rectangle(frame2, Rect(40, 10, 10, 10), Scalar(0, 0, 250), 2);
+    rectangle(frame, Rect(20, 20, 15, 15), Scalar(0, 0, 250), 4);
+    rectangle(frame, Rect(45, 20, 15, 15), Scalar(0, 0, 250), 3);
+    rectangle(frame, Rect(70, 20, 15, 15), Scalar(0, 0, 250), 2);
 }
 
 
@@ -200,7 +184,7 @@ Rect FaceHandler::getFace(Mat* frame_gray) {
     std::vector<int> rejectLevels;
     std::vector<double> levelWeights;
 
-    face_cascade.detectMultiScale(*frame_gray, faces, rejectLevels, levelWeights, 1.1, 3, 0, Size(60, 60), Size(), true); //, 0, Size(60, 60), Size(300, 300));
+    face_cascade.detectMultiScale(*frame_gray, faces, rejectLevels, levelWeights, 1.1, 3, 0, Size(60, 60), Size(), true);
 
     if (faces.size() > 0) {
         return faces[0];

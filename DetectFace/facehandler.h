@@ -49,14 +49,11 @@ class FaceHandler {
     VideoCapture cap;
     CascadeClassifier face_cascade;
 
-    Rect workingRect;
     Rect templateRect;
-    Point workingCenter;
-
     Mat templateImage;  // to store the nose
     Mat resultImage;    // to store the matchTemplate result
 
-    Mat frame1,frame2,frameRect1,frameRect2;
+    Mat frame, frameRect;
 
 public:
     FaceHandler();
