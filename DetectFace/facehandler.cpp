@@ -6,6 +6,12 @@ FaceHandler::FaceHandler() :
     templateRect((workingRect.width-templateWidth)/2, (workingRect.height-templateHeight)/2, templateWidth, templateHeight),
     workingCenter(workingRect.x+subImageWidth/2, workingRect.y+subImageHeight/2) {
 
+    cout << "===================================" << endl;
+    cout << "          START OF PROGRAM         " << endl;
+    cout << "===================================" << endl;
+    cout << "D to toggle debugging graphics." << endl;
+    cout << "Escape to quit." << endl;
+
     state = 'N';
 
 
@@ -117,27 +123,31 @@ void FaceHandler::update_C(Rect& face) {
 
     // Compute the translation vector between the origin and the matching rect
     Point vect(maxLoc.x-templateRect.x, maxLoc.y-templateRect.y);
-
-    // Draw green rectangle and the translation vector
-    rectangle(frame2, average_face, Scalar(0, 255, 0), 2);
-    Point faceCenter(average_face.x + average_face.width / 2, average_face.y + average_face.height / 2);
-    Point p(faceCenter.x+vect.x, faceCenter.y+vect.y);
-    arrowedLine(frame2, faceCenter, p, Scalar(255, 255, 255), 2);
-
-    // Draw template in face
-    cout << maxLoc.x << ", " << maxLoc.y << endl;
-    rectangle(frame2, Rect(average_face.x + maxLoc.x, average_face.y + maxLoc.y, 8, 8), Scalar(200, 0, 200), 3);
-    //Rect blueSquare();
-    Rect blackSquare(workingRect.x + templateRect.x, workingRect.y + templateRect.y, templateRect.width, templateRect.height);
-    rectangle(frame2, blackSquare, Scalar(0, 0, 0), 2);
-    rectangle(frame2, workingRect, Scalar(230, 40, 40), 2);
     // Draw the direction
     forward_mvmt += vect.y;
     side_mvmt += vect.x;
-    //std::cout << vect.x << " " << vect.y << std::endl;
-    Point dirCenter(frameWidth / 2, frameHeight - 20);
-    Point dirEdge(dirCenter.x + side_mvmt, dirCenter.y + forward_mvmt);
-    arrowedLine(frame2, dirCenter, dirEdge, Scalar(0, 0, 255), 3);
+
+    // Green rect around face
+    rectangle(frame2, average_face, Scalar(0, 255, 0), 2);
+
+    if (debug_graphics) {
+        // Draw the translation vector
+        Point faceCenter(average_face.x + average_face.width / 2, average_face.y + average_face.height / 2);
+        Point p(faceCenter.x+vect.x, faceCenter.y+vect.y);
+        arrowedLine(frame2, faceCenter, p, Scalar(255, 255, 255), 2);
+
+        // Draw template in face
+        //cout << maxLoc.x << ", " << maxLoc.y << endl;
+        rectangle(frame2, Rect(average_face.x + maxLoc.x, average_face.y + maxLoc.y, 8, 8), Scalar(200, 0, 200), 3);
+        Rect blackSquare(workingRect.x + templateRect.x, workingRect.y + templateRect.y, templateRect.width, templateRect.height);
+        rectangle(frame2, blackSquare, Scalar(0, 0, 0), 2);
+        rectangle(frame2, workingRect, Scalar(230, 40, 40), 2);
+
+        //std::cout << vect.x << " " << vect.y << std::endl;
+        Point dirCenter(frameWidth / 2, frameHeight - 20);
+        Point dirEdge(dirCenter.x + side_mvmt, dirCenter.y + forward_mvmt);
+        arrowedLine(frame2, dirCenter, dirEdge, Scalar(0, 0, 255), 3);
+    }
 
     // Swap matrixes
     //swap(frameRect1, frameRect2);

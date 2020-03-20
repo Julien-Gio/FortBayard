@@ -27,6 +27,7 @@ class FaceHandler {
     float forward_mvmt = 0.0;
     float side_mvmt = 0.0;  // <0 for left and >0 for right
 
+    bool debug_graphics = true;
 
     const unsigned int NUM_AVG_OVER_FRAMES = 10;  // Nombre de frames du visage en mémoire pour trouver la moyenne
     /* STATES
@@ -60,6 +61,9 @@ public:
     FaceHandler();
 
     void update();
+    void toogle_debug_graphics() {
+        debug_graphics = !debug_graphics;
+    }
 
 private:
     void update_C(Rect& face);
