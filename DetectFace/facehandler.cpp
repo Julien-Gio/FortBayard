@@ -77,10 +77,6 @@ void FaceHandler::update() {
             templateRect.y = average_face.height / 2 - templateRect.height / 2 + (average_face.height * templateOffsetY);
             templateImage = Mat(frameRect1, templateRect);
 
-            // 2) Reset mouvement
-            forward_mvmt = 0;
-            side_mvmt = 0;
-
             // 3) Passer en mode continue
             state = 'C';
         } else {
@@ -121,9 +117,7 @@ void FaceHandler::update_C(Rect& face) {
     int result_cols = frameRect2.cols - templateImage.cols + 1;
     int result_rows = frameRect2.rows - templateImage.rows + 1;
     resultImage.create(result_cols, result_rows, CV_32FC1);
-    cout << "corr:" << resultImage.rows << " " << resultImage.cols << endl;
-    cout << "img:" << frameRect2.rows << " " << frameRect2.cols << endl;
-    cout << "templ:" << templateImage.rows << " " << templateImage.cols << endl;
+
     // Do the Matching between the working rect in frame2 and the templateImage in frame1
     matchTemplate(frameRect2, templateImage, resultImage, TM_CCORR_NORMED);
 
@@ -133,32 +127,45 @@ void FaceHandler::update_C(Rect& face) {
 
     // Compute the translation vector between the origin and the matching rect
     Point vect(maxLoc.x-templateRect.x, maxLoc.y-templateRect.y);
-    // Draw the direction
-    if (abs(vect.y) >= SEUIL)
-        forward_mvmt += vect.y;
-    if (abs(vect.x) >= SEUIL)
-        side_mvmt += vect.x;
 
-    // Green rect around face
-    rectangle(frame2, average_face, Scalar(0, 255, 0), 2);
+    // Get the direction
+    Point dir(0, 0);
+    if (vect.x >= SEUIL)
+        dir.x = 1;
+    else if (vect.x <= -SEUIL)
+        dir.x = -1;
+    if (vect.y >= SEUIL)
+        dir.y = 1;
+    else if (vect.y <= -SEUIL)
+        dir.y = -1;
+
+    // Draw the direction
+    Point dirCenter(frameWidth / 2, frameHeight - 40);
+    Point dirEdge(dirCenter.x + dir.x * 45, dirCenter.y + dir.y * 35);
+    arrowedLine(frame2, dirCenter, dirEdge, Scalar(0, 0, 255), 5);
 
     if (debug_graphics) {
+
+        // GREEN RECT : face
+        rectangle(frame2, average_face, Scalar(0, 255, 0), 2);
+
         // Draw the translation vector
         Point faceCenter(average_face.x + average_face.width / 2, average_face.y + average_face.height / 2);
-        Point p(faceCenter.x+vect.x, faceCenter.y+vect.y);
+        Point p(faceCenter.x + vect.x, faceCenter.y + vect.y);
         arrowedLine(frame2, faceCenter, p, Scalar(255, 255, 255), 2);
 
-        // Draw template in face
-        //cout << maxLoc.x << ", " << maxLoc.y << endl;
-        rectangle(frame2, Rect(average_face.x + maxLoc.x, average_face.y + maxLoc.y, 8, 8), Scalar(200, 0, 200), 3);
-        Rect blackSquare(average_face.x + templateRect.x, average_face.y + templateRect.y, templateRect.width, templateRect.height);
-        rectangle(frame2, blackSquare, Scalar(0, 0, 0), 2);
+        // BLUE RECT : working rect
         rectangle(frame2, workingRect, Scalar(230, 40, 40), 2);
 
-        //std::cout << vect.x << " " << vect.y << std::endl;
-        Point dirCenter(frameWidth / 2, frameHeight - 20);
-        Point dirEdge(dirCenter.x + side_mvmt, dirCenter.y + forward_mvmt);
-        arrowedLine(frame2, dirCenter, dirEdge, Scalar(0, 0, 255), 3);
+        // BLACK RECT : template rect
+        Rect blackSquare(average_face.x + templateRect.x, average_face.y + templateRect.y,
+                         templateRect.width, templateRect.height);
+        rectangle(frame2, blackSquare, Scalar(0, 0, 0), 2);
+
+        // PURPLE DOT : center of result
+        rectangle(frame2, Rect(average_face.x + templateRect.width / 2 + maxLoc.x,
+                               average_face.y + templateRect.height + maxLoc.y, 5, 5),
+                  Scalar(230, 0, 230), 3);
     }
 
     // Swap matrixes
@@ -172,8 +179,10 @@ void FaceHandler::update_J(Rect& face) {
 
     Rect average_face = getAverageFace();
 
-    // Draw yellow rectangle
-    rectangle(frame2, average_face, Scalar(0, 200, 220), 2);
+    if (debug_graphics) {
+        // Draw yellow rectangle
+        rectangle(frame2, average_face, Scalar(0, 200, 220), 2);
+    }
 }
 
 
@@ -190,9 +199,9 @@ Rect FaceHandler::getFace(Mat* frame_gray) {
 
     std::vector<int> rejectLevels;
     std::vector<double> levelWeights;
-cout << "ee" << endl;
+
     face_cascade.detectMultiScale(*frame_gray, faces, rejectLevels, levelWeights, 1.1, 3, 0, Size(60, 60), Size(), true); //, 0, Size(60, 60), Size(300, 300));
-cout << "oo" << endl;
+
     if (faces.size() > 0) {
         return faces[0];
     } else {

@@ -21,14 +21,12 @@ class FaceHandler {
     const int frameHeight = 240;
     const int subImageWidth = 100;
     const int subImageHeight = 100;
-    const float templateWidth = 0.3;  // Percentage of face
-    const float templateHeight = 0.2;  // Percentage of face
+    const float templateWidth = 0.4;  // Percentage of face
+    const float templateHeight = 0.3;  // Percentage of face
     const float templateOffsetX = 0.0;  // Percentage of face. < 0 to the left, > 0 to the right
     const float templateOffsetY = 0.2;  // Percentage of face. < 0 above center, > 0 below center
 
-    const float SEUIL = 4.0;
-    float forward_mvmt = 0.0;
-    float side_mvmt = 0.0;  // <0 for left and >0 for right
+    const float SEUIL = 2.0;
 
     bool debug_graphics = true;
 
