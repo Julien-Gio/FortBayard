@@ -21,14 +21,14 @@ class FaceHandler {
     const int frameHeight = 240;
     const int subImageWidth = 100;
     const int subImageHeight = 100;
-    const int templateWidth = 25;
-    const int templateHeight = 25;
+    const int templateWidth = 30;
+    const int templateHeight = 30;
 
     float forward_mvmt = 0.0;
     float side_mvmt = 0.0;  // <0 for left and >0 for right
 
 
-    const int NUM_AVG_OVER_FRAMES = 10;  // Nombre de frames du visage en mémoire pour trouver la moyenne
+    const unsigned int NUM_AVG_OVER_FRAMES = 10;  // Nombre de frames du visage en mémoire pour trouver la moyenne
     /* STATES
      * 'C' : continously detecting faces
      * 'N' : currently no face is detected
@@ -51,6 +51,7 @@ class FaceHandler {
     Rect templateRect;
     Point workingCenter;
 
+    Mat templateImage;  // to store the nose
     Mat resultImage;    // to store the matchTemplate result
 
     Mat frame1,frame2,frameRect1,frameRect2;

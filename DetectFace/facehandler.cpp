@@ -68,7 +68,7 @@ void FaceHandler::update() {
             // Nous avons stabilisé
             // 1) Récupérer l'image de référence
             cv::cvtColor(Mat(frame2, workingRect), frameRect1, COLOR_BGR2GRAY);
-
+            templateImage = Mat(frameRect1, templateRect);
             // 2) Reset mouvement
             forward_mvmt = 0;
             side_mvmt = 0;
@@ -106,7 +106,7 @@ void FaceHandler::update_C(Rect& face) {
     cv::cvtColor(Mat(frame2, average_face), frameRect2, COLOR_BGR2GRAY);
 
     // Extract template image in frame1
-    Mat templateImage(frameRect1, templateRect);
+    //Mat templateImage(frameRect1, templateRect);
 
     // Do the Matching between the working rect in frame2 and the templateImage in frame1
     matchTemplate(frameRect2, templateImage, resultImage, TM_CCORR_NORMED);
@@ -125,8 +125,12 @@ void FaceHandler::update_C(Rect& face) {
     arrowedLine(frame2, faceCenter, p, Scalar(255, 255, 255), 2);
 
     // Draw template in face
+    cout << maxLoc.x << ", " << maxLoc.y << endl;
     rectangle(frame2, Rect(average_face.x + maxLoc.x, average_face.y + maxLoc.y, 8, 8), Scalar(200, 0, 200), 3);
-
+    //Rect blueSquare();
+    Rect blackSquare(workingRect.x + templateRect.x, workingRect.y + templateRect.y, templateRect.width, templateRect.height);
+    rectangle(frame2, blackSquare, Scalar(0, 0, 0), 2);
+    rectangle(frame2, workingRect, Scalar(230, 40, 40), 2);
     // Draw the direction
     forward_mvmt += vect.y;
     side_mvmt += vect.x;
@@ -136,7 +140,7 @@ void FaceHandler::update_C(Rect& face) {
     arrowedLine(frame2, dirCenter, dirEdge, Scalar(0, 0, 255), 3);
 
     // Swap matrixes
-    swap(frameRect1, frameRect2);
+    //swap(frameRect1, frameRect2);
 }
 
 
