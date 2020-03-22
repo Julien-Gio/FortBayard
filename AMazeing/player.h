@@ -14,6 +14,7 @@ class Player
     const float HEIGHT = 1.8;
     float yRotation = 0;
     float posX = 1, posY = 1; // En fait c'est posX et posZ mais bon c'est plus explicite comme ça je trouve
+
 public:
     Player();
     void setCamera();
@@ -21,6 +22,9 @@ public:
     void walk(float);
     float getRotation();
     void drawPlayer(QPainter *, float sizeOfCase, QPoint offset);
+    float getPosX(){return posX;}
+    float getPosY(){return posY;}
+    void setPosition(float x, float y);
 };
 
 #endif // PLAYER_H

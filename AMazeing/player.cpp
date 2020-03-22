@@ -20,7 +20,6 @@ void Player::rotate(float r){
 void Player::walk(float w){
     posX += w * std::cos(yRotation);
     posY += w * std::sin(yRotation);
-    std::cout<<posX<<"   "<<posY<<std::endl;
 }
 
 float Player::getRotation(){
@@ -36,4 +35,9 @@ void Player::drawPlayer(QPainter * painter, float sizeOfCase, QPoint offset){
 
     const float length = size * 1.3;
     painter->drawLine(mapPosX, mapPosY, mapPosX + length * cos(yRotation), mapPosY + length * sin(yRotation));
+}
+
+void Player::setPosition(float x, float y){
+    posX = x;
+    posY = y;
 }

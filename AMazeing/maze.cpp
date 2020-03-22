@@ -68,6 +68,8 @@ Cell::Direction Maze::direction(Point f, Point t)
 
 void Maze::display(){
 
+    player.setCamera();
+
     float gray[4] = {0.8, 0.8, 0.8, 1};
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, gray);
     glBegin(GL_QUADS);
@@ -200,22 +202,55 @@ void Maze::generate()
     }
 }
 
-void Maze::drawMap(QPainter *painter, float sizeOfCase, QPoint offset){
-    painter->fillRect(offset.rx(), offset.ry(), sizeOfCase * width_, sizeOfCase * height_, QBrush(QColor(0, 0, 0, 120)));
+void Maze::drawMap(QPainter *painter){
+    painter->fillRect(offset.x(), offset.y(), sizeOfCaseOnMap * width_, sizeOfCaseOnMap * height_, QBrush(QColor(0, 0, 0, 120)));
     painter->setBrush(Qt::white);
     painter->setPen(QPen(Qt::white, 2));
     for (unsigned int i=0;i<height_;i++) {
         if(grid_[i][0].isFrontier(Cell::W))
-            painter->drawLine(sizeOfCase*QPoint(0, i) + offset, sizeOfCase*QPoint(0, i + 1) + offset);
+            painter->drawLine(sizeOfCaseOnMap*QPoint(0, i) + offset, sizeOfCaseOnMap*QPoint(0, i + 1) + offset);
         for (unsigned int j=0;j<width_;j++) {
-            if (grid_[i][j].isFrontier(Cell::E))
-               painter->drawLine(sizeOfCase*QPoint(j + 1, i) + offset, sizeOfCase*QPoint(j + 1, i + 1) + offset);
+            if (grid_[i][j].isFrontier(Cell::E)){
+                painter->drawLine(sizeOfCaseOnMap*QPoint(j + 1, i) + offset, sizeOfCaseOnMap*QPoint(j + 1, i + 1) + offset);
+            }
             if (grid_[i][j].isFrontier(Cell::S))
-                painter->drawLine(sizeOfCase*QPoint(j, i + 1) + offset, sizeOfCase*QPoint(j + 1, i + 1) + offset);
+                painter->drawLine(sizeOfCaseOnMap*QPoint(j, i + 1) + offset, sizeOfCaseOnMap*QPoint(j + 1, i + 1) + offset);
         }
     }
     for (unsigned int j=0;j<width_;j++) {
         if (grid_[0][j].isFrontier(Cell::N))
-            painter->drawLine(sizeOfCase*QPoint(j, 0) + offset, sizeOfCase*QPoint(j + 1, 0) + offset);
+            painter->drawLine(sizeOfCaseOnMap*QPoint(j, 0) + offset, sizeOfCaseOnMap*QPoint(j + 1, 0) + offset);
     }
+
+    player.drawPlayer(painter, sizeOfCaseOnMap/sizeByRoom, offset);
+}
+
+void Maze::rotate(float r){
+    player.rotate(r);
+}
+
+void Maze::walk(float w){
+    const float hitboxSize = 0.3;
+    float newX = player.getPosX() + w * std::cos(player.getRotation());
+    float newY = player.getPosY() +  w * std::sin(player.getRotation());
+
+    if(std::fmod(newX, sizeByRoom) <= hitboxSize){
+        if(grid_[std::floor(newY/sizeByRoom)][std::floor(newX/sizeByRoom)].isFrontier(Cell::W)){
+            newX = std::floor(newX/sizeByRoom)*sizeByRoom + hitboxSize;
+        }
+    }else if(std::fmod(newX, sizeByRoom) >= sizeByRoom - hitboxSize){
+        if(grid_[std::floor(newY/sizeByRoom)][std::floor(newX/sizeByRoom)].isFrontier(Cell::E)){
+            newX = std::floor(newX/sizeByRoom)*sizeByRoom + sizeByRoom - hitboxSize;
+        }
+    }
+    if(std::fmod(newY, sizeByRoom) <= hitboxSize){
+        if(grid_[std::floor(newY/sizeByRoom)][std::floor(newX/sizeByRoom)].isFrontier(Cell::N)){
+            newY = std::floor(newY/sizeByRoom)*sizeByRoom + hitboxSize;
+        }
+    }else if(std::fmod(newY, sizeByRoom) >= sizeByRoom - hitboxSize){
+        if(grid_[std::floor(newY/sizeByRoom)][std::floor(newX/sizeByRoom)].isFrontier(Cell::S)){
+            newY = std::floor(newY/sizeByRoom)*sizeByRoom + sizeByRoom - hitboxSize;
+        }
+    }
+    player.setPosition(newX, newY);
 }

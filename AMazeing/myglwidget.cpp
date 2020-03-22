@@ -64,7 +64,6 @@ void MyGLWidget::paintEvent(QPaintEvent *event)
     // Definition de la position de la camera
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    player.setCamera();
     maze.display();
 
     glShadeModel(GL_FLAT);
@@ -75,8 +74,7 @@ void MyGLWidget::paintEvent(QPaintEvent *event)
     glPopMatrix();
 
     QPainter painter(this);
-    maze.drawMap(&painter, sizeOfCaseOnMap, QPoint(10, 10));
-    player.drawPlayer(&painter, sizeOfCaseOnMap/maze.getSizeOfRoom(), QPoint(10, 10));
+    maze.drawMap(&painter);
     painter.end();
 }
 
@@ -119,25 +117,25 @@ void MyGLWidget::keyPressEvent(QKeyEvent * event)
 
         case Qt::Key_Right:
         {
-            player.rotate(10 * 3.14159 / 180);
+            maze.rotate(10 * 3.14159 / 180);
             break;
         }
 
         case Qt::Key_Left:
         {
-            player.rotate(-10 * 3.14159 / 180);
+            maze.rotate(-10 * 3.14159 / 180);
             break;
         }
 
         case Qt::Key_Up:
         {
-            player.walk(0.1);
+            maze.walk(0.1);
             break;
         }
 
         case Qt::Key_Down:
         {
-            player.walk(-0.1);
+            maze.walk(-0.1);
             break;
         }
 

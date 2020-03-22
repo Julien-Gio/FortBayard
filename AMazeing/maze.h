@@ -17,6 +17,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <QPainter>
+#include "player.h"
 
 using namespace std;
 
@@ -24,11 +25,15 @@ using Point=pair<int,int>;
 
 class Maze
 {
+    Player player;
     vector<vector<Cell>> grid_;
 
     const float wallHeight = 3;
     const float wallDepth = 0.2;
     const float sizeByRoom = 2;
+
+    const float sizeOfCaseOnMap = 30; // Value in pixel
+    const QPoint offset = QPoint(10, 10);
 
     int width_;
     int height_;
@@ -43,8 +48,11 @@ public:
     void reinit();
     void display();
     void generate();
-    void drawMap(QPainter*, float, QPoint offset);
+    void drawMap(QPainter*);
     float getSizeOfRoom(){return sizeByRoom;}
+
+    void rotate(float);
+    void walk(float);
 
 private:
     void drawVerticalWall(QPoint, QPoint);
