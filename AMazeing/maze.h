@@ -18,6 +18,7 @@
 #include <GL/glu.h>
 #include <QPainter>
 #include "player.h"
+#include <QGLWidget>
 
 using namespace std;
 
@@ -25,7 +26,22 @@ using Point=pair<int,int>;
 
 class Maze
 {
+    class Collectible{
+        const float RAYON = 0.4, ROTATION_SPEED = 20;
+        bool hasBeenCollected = false;
+        GLuint textId;
+        GLUquadric* quadrique;
+        float posX = 3, posY = 1, z = 1.5;
+
+    public:
+        Collectible(QString);
+        ~Collectible();
+        void display(float);
+    };
+
+    std::vector<Collectible> collectibles;
     Player player;
+
     vector<vector<Cell>> grid_;
 
     const float wallHeight = 3;
@@ -51,6 +67,8 @@ public:
     void drawMap(QPainter*);
     float getSizeOfRoom(){return sizeByRoom;}
 
+    void init();
+    bool tryFrontier(int, int, Cell::Direction);
     void rotate(float);
     void walk(float);
 

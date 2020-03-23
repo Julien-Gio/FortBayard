@@ -44,6 +44,7 @@ void MyGLWidget::initializeGL()
 {
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_LIGHT0);
+    maze.init();
 }
 
 void MyGLWidget::paintEvent(QPaintEvent *event)
@@ -87,7 +88,7 @@ void MyGLWidget::resizeGL(int width, int height)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    gluPerspective(70, WIN_WIDTH/(float)WIN_HEIGHT, 0.1, 40);
+    gluPerspective(70, WIN_WIDTH/(float)WIN_HEIGHT, 0.01, 40);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();

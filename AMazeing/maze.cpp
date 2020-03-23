@@ -15,7 +15,11 @@ using namespace std;
 Maze::Maze(int width, int height)
     : grid_(height,vector<Cell>(width)), width_(width), height_(height)
 {
+}
+
+void Maze::init(){
     generate();
+    collectibles.emplace_back("tse");
 }
 
 void Maze::reinit()
@@ -102,6 +106,10 @@ void Maze::display(){
     for (unsigned int j=0;j<width_;j++) {
         if (grid_[0][j].isFrontier(Cell::N))
             drawVerticalWall(QPoint(j, 0), QPoint(j + 1, 0));
+    }
+
+    for(unsigned int i = 0; i < collectibles.size(); i++){
+        collectibles[i].display(10);
     }
 }
 
@@ -253,4 +261,42 @@ void Maze::walk(float w){
         }
     }
     player.setPosition(newX, newY);
+}
+
+
+
+/* Collectibles */
+Maze::Collectible::Collectible(QString imageName){
+
+    quadrique = gluNewQuadric();
+    gluQuadricTexture(quadrique, GL_TRUE);
+
+    QString path = QString(":/tse.png");
+    QImage image = QGLWidget::convertToGLFormat(QImage(path));
+    glGenTextures(1, &textId);
+    glBindTexture(GL_TEXTURE_2D, textId);
+    glTexImage2D(GL_TEXTURE_2D, 0, 4, image.width(), image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
+
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+
+    posX = rand()%10;
+}
+
+
+Maze::Collectible::~Collectible(){
+    gluDeleteQuadric(quadrique);
+}
+
+void Maze::Collectible::display(float elapsedTime){
+    glPushMatrix();
+
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, textId); // On définit la texture courante
+    glTranslated(posX, z, posY);
+
+    gluSphere(quadrique, RAYON, 50, 50);
+    glDisable(GL_TEXTURE_2D);
+
+    glPopMatrix();
 }
