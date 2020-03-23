@@ -31,7 +31,8 @@ class Maze
         bool hasBeenCollected = false;
         GLuint textId;
         GLUquadric* quadrique;
-        float posX = 3, posY = 1, z = 1.5;
+        float posX = 1, posY = 1, z = 1.5;
+        float totalTime = 0;
 
     public:
         Collectible(QString);

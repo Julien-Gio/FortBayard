@@ -280,7 +280,8 @@ Maze::Collectible::Collectible(QString imageName){
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
-    posX = rand()%10;
+    //posX = rand()%10;
+    totalTime = (rand()%1000)/500.f;
 }
 
 
@@ -289,11 +290,17 @@ Maze::Collectible::~Collectible(){
 }
 
 void Maze::Collectible::display(float elapsedTime){
+    totalTime += elapsedTime;
     glPushMatrix();
+
+    float white[4] = {1, 1, 1, 1};
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, white);
 
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, textId); // On définit la texture courante
-    glTranslated(posX, z, posY);
+    glTranslated(posX, z + 0.1 * std::sin(totalTime/300.f), posY);
+    glRotatef(360 * std::fmod(totalTime/4000.f, 1), 0, 1, 0);
+    glRotatef(-90, 1, 0, 0);
 
     gluSphere(quadrique, RAYON, 50, 50);
     glDisable(GL_TEXTURE_2D);
