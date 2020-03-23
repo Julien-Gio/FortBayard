@@ -294,7 +294,8 @@ void Maze::Collectible::display(float elapsedTime){
     glPushMatrix();
 
     float white[4] = {1, 1, 1, 1};
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, white);
+    float black[4] = {0, 0, 0, 1};
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, white);
 
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, textId); // On définit la texture courante
@@ -304,6 +305,7 @@ void Maze::Collectible::display(float elapsedTime){
 
     gluSphere(quadrique, RAYON, 50, 50);
     glDisable(GL_TEXTURE_2D);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, black);
 
     glPopMatrix();
 }
