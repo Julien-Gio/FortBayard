@@ -15,6 +15,7 @@ using namespace std;
 Maze::Maze(int width, int height)
     : grid_(height,vector<Cell>(width)), width_(width), height_(height)
 {
+    cout << "eeeeeee" << endl;
 }
 
 void Maze::init(){

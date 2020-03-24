@@ -8,6 +8,7 @@
 #include <QTimer>
 #include "player.h"
 #include "maze.h"
+#include "facehandler.h"
 
 class Bubble;
 class QtLogo;
@@ -19,6 +20,7 @@ class MyGLWidget : public QGLWidget
     Q_OBJECT
 
     Maze maze;
+    FaceHandler fh;
 
 public:
     MyGLWidget(QWidget *parent = 0);
