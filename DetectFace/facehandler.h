@@ -13,7 +13,6 @@
 
 
 using namespace cv;
-using namespace std;
 
 
 class FaceHandler {
@@ -27,10 +26,8 @@ class FaceHandler {
     const float templateOffsetY = 0.2;  // Percentage of face. < 0 above center, > 0 below center
 
     const float SEUIL = 2.0;
+    const unsigned int NUM_AVG_OVER_FRAMES = 12;  // Nombre de frames du visage en mémoire pour trouver la moyenne
 
-    bool debug_graphics = true;
-
-    const unsigned int NUM_AVG_OVER_FRAMES = 10;  // Nombre de frames du visage en mémoire pour trouver la moyenne
     /* STATES
      * 'C' : continously detecting faces
      * 'N' : currently no face is detected
@@ -47,7 +44,7 @@ class FaceHandler {
 
     std::vector<Rect> faces;
     VideoCapture cap;
-    CascadeClassifier face_cascade;
+    CascadeClassifier faceCascade;
 
     Rect templateRect;
     Mat templateImage;  // to store the nose
@@ -55,18 +52,21 @@ class FaceHandler {
 
     Mat frame, frameRect;
 
+    bool debugGraphics = true;
+
 public:
     FaceHandler();
 
     void update();
+
     void toogle_debug_graphics() {
-        debug_graphics = !debug_graphics;
+        debugGraphics = !debugGraphics;
     }
 
 private:
-    void update_C(Rect& face);
-    void update_J(Rect& face);
-    void update_N(Rect& face);
+    void updateC(Rect& face);  // State 'C'
+    void updateJ(Rect& face);  // State 'J'
+    void updateN(Rect& face);  // State 'N'
     Rect getFace(Mat* frame_gray);
     Rect getAverageFace();
 
