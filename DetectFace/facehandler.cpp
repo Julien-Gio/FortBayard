@@ -10,8 +10,8 @@ FaceHandler::FaceHandler() :
     std::cout << "Frame width :" << cap.get(CAP_PROP_FRAME_WIDTH) << std::endl;
     std::cout << "Frame height :" << cap.get(CAP_PROP_FRAME_HEIGHT) << std::endl;
 
-    cap.set(CAP_PROP_FRAME_WIDTH,frameWidth);
-    cap.set(CAP_PROP_FRAME_HEIGHT,frameHeight);
+    cap.set(CAP_PROP_FRAME_WIDTH, frameWidth);
+    cap.set(CAP_PROP_FRAME_HEIGHT, frameHeight);
     if(!cap.isOpened())  // check if we succeeded
     {
         std::cerr << "Error openning the default camera!" << std::endl;
@@ -122,13 +122,13 @@ void FaceHandler::updateC(Rect& face) {
 
     // Get the direction
     Point dir(0, 0);
-    if (vect.x >= SEUIL)
+    if (vect.x >= SEUILS[DROITE])  // Droite
         dir.x = 1;
-    else if (vect.x <= -SEUIL)
+    else if (vect.x <= -SEUILS[GAUCHE])  // Gauche
         dir.x = -1;
-    if (vect.y >= SEUIL)
+    if (vect.y >= SEUILS[BAS])  // Bas
         dir.y = 1;
-    else if (vect.y <= -SEUIL)
+    else if (vect.y <= -SEUILS[HAUT])  // Haut
         dir.y = -1;
 
     // Draw the direction
