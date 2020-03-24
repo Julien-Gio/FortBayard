@@ -12,6 +12,7 @@
 #include <list>
 #include <utility>
 #include <QPoint>
+#include<iostream>
 
 #include <qopengl.h>
 #include <GL/gl.h>
@@ -26,7 +27,7 @@ using Point=pair<int,int>;
 
 
 class Collectible{
-    const float RAYON = 0.4, ROTATION_SPEED = 20;
+    float RAYON = 0.4, ROTATION_SPEED = 20;
     bool hasBeenCollected = false;
     GLuint textId;
     GLUquadric* quadrique;
@@ -38,14 +39,14 @@ public:
     ~Collectible();
     void display(float);
     void setPosition(float x, float y){posX = x; posY = y;}
+    virtual void collected(){}
+    float getX(){return posX;}
+    float getY(){return posY;}
 };
-
-
-
 
 class Maze
 {
-    std::vector<Collectible> collectibles;
+    std::vector<Collectible*> collectibles;
     Player player;
 
     vector<vector<Cell>> grid_;
@@ -77,10 +78,18 @@ public:
     bool tryFrontier(int, int, Cell::Direction);
     void rotate(float);
     void walk(float);
+    void removeWall();
 
 private:
     void drawVerticalWall(QPoint, QPoint);
     void drawHorizontalWall(QPoint, QPoint);
+};
+
+class Key : public Collectible{
+    Maze * maze;
+public:
+    Key(Maze*);
+    void collected();
 };
 
 #endif // MAZE_H

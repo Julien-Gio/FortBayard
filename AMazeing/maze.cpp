@@ -4,7 +4,6 @@
  * C++ implementation by C. Ducottet
 **/
 
-#include<iostream>
 #include <vector>
 #include <ctime>
 #include "cell.h"
@@ -19,8 +18,8 @@ Maze::Maze(int width, int height)
 
 void Maze::init(){
     generate();
-    collectibles.emplace_back("tse");
-    collectibles[0].setPosition((int)(sizeByRoom * rand())%width_ + 1, (int)(sizeByRoom * rand())%height_ + 1);
+    collectibles.emplace_back(new Key(this));
+    collectibles[0]->setPosition((int)(sizeByRoom * rand())%width_ + 1, (int)(sizeByRoom * rand())%height_ + 1);
 }
 
 void Maze::reinit()
@@ -110,7 +109,7 @@ void Maze::display(){
     }
 
     for(unsigned int i = 0; i < collectibles.size(); i++){
-        collectibles[i].display(10);
+        collectibles[i]->display(10);
     }
 }
 
@@ -234,6 +233,14 @@ void Maze::drawMap(QPainter *painter){
     player.drawPlayer(painter, sizeOfCaseOnMap/sizeByRoom, offset);
 }
 
+bool Maze::tryFrontier(int x, int y, Cell::Direction d){
+    if(x >= 0 && x < width_ && y >= 0 && y < height_){
+        if(grid_[y][x].isFrontier(d))
+            return true;
+    }
+    return false;
+}
+
 void Maze::rotate(float r){
     player.rotate(r);
 }
@@ -244,24 +251,42 @@ void Maze::walk(float w){
     float newY = player.getPosY() +  w * std::sin(player.getRotation());
 
     if(std::fmod(newX, sizeByRoom) <= hitboxSize){
-        if(grid_[std::floor(newY/sizeByRoom)][std::floor(newX/sizeByRoom)].isFrontier(Cell::W)){
+        if(tryFrontier(std::floor(newX/sizeByRoom), std::floor(newY/sizeByRoom), Cell::W)){
             newX = std::floor(newX/sizeByRoom)*sizeByRoom + hitboxSize;
         }
     }else if(std::fmod(newX, sizeByRoom) >= sizeByRoom - hitboxSize){
-        if(grid_[std::floor(newY/sizeByRoom)][std::floor(newX/sizeByRoom)].isFrontier(Cell::E)){
+        if(tryFrontier(std::floor(newX/sizeByRoom), std::floor(newY/sizeByRoom), Cell::E)){
             newX = std::floor(newX/sizeByRoom)*sizeByRoom + sizeByRoom - hitboxSize;
         }
     }
     if(std::fmod(newY, sizeByRoom) <= hitboxSize){
-        if(grid_[std::floor(newY/sizeByRoom)][std::floor(newX/sizeByRoom)].isFrontier(Cell::N)){
+        if(tryFrontier(std::floor(newX/sizeByRoom), std::floor(newY/sizeByRoom), Cell::N)){
             newY = std::floor(newY/sizeByRoom)*sizeByRoom + hitboxSize;
         }
     }else if(std::fmod(newY, sizeByRoom) >= sizeByRoom - hitboxSize){
-        if(grid_[std::floor(newY/sizeByRoom)][std::floor(newX/sizeByRoom)].isFrontier(Cell::S)){
+        if(tryFrontier(std::floor(newX/sizeByRoom), std::floor(newY/sizeByRoom), Cell::S)){
             newY = std::floor(newY/sizeByRoom)*sizeByRoom + sizeByRoom - hitboxSize;
         }
     }
+
+    for(unsigned int i = 0; i < collectibles.size(); i++){
+        if(abs(newX - collectibles[i]->getX()) < hitboxSize && abs(newY - collectibles[i]->getY()) < hitboxSize){
+            collectibles[i]->collected();
+            delete collectibles[i];
+            collectibles.erase(collectibles.begin() + i);
+            i--;
+        }
+    }
+
     player.setPosition(newX, newY);
+}
+
+void Maze::removeWall(){
+    switch (0) {
+    case(0):
+        grid_[0][rand()%width_].setFrontier(Cell::N, false);
+        break;
+    }
 }
 
 
@@ -308,4 +333,15 @@ void Collectible::display(float elapsedTime){
     glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, black);
 
     glPopMatrix();
+}
+
+
+Key::Key(Maze* m) : Collectible(QString("tse")){
+    std::cout<<"key !!!"<<std::endl;
+    maze = m;
+}
+
+void Key::collected(){
+    std::cout<<"openTheDoor !!!"<<std::endl;
+    maze->removeWall();
 }
