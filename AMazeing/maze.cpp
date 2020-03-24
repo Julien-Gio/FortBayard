@@ -20,6 +20,7 @@ Maze::Maze(int width, int height)
 void Maze::init(){
     generate();
     collectibles.emplace_back("tse");
+    collectibles[0].setPosition((int)(sizeByRoom * rand())%width_ + 1, (int)(sizeByRoom * rand())%height_ + 1);
 }
 
 void Maze::reinit()
@@ -266,7 +267,7 @@ void Maze::walk(float w){
 
 
 /* Collectibles */
-Maze::Collectible::Collectible(QString imageName){
+Collectible::Collectible(QString imageName){
 
     quadrique = gluNewQuadric();
     gluQuadricTexture(quadrique, GL_TRUE);
@@ -280,16 +281,15 @@ Maze::Collectible::Collectible(QString imageName){
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
-    //posX = rand()%10;
     totalTime = (rand()%1000)/500.f;
 }
 
 
-Maze::Collectible::~Collectible(){
+Collectible::~Collectible(){
     gluDeleteQuadric(quadrique);
 }
 
-void Maze::Collectible::display(float elapsedTime){
+void Collectible::display(float elapsedTime){
     totalTime += elapsedTime;
     glPushMatrix();
 

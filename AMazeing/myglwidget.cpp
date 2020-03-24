@@ -61,6 +61,7 @@ void MyGLWidget::paintEvent(QPaintEvent *event)
 
     // Reinitialisation des tampons
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(0, 0, 0, 0);
 
     // Definition de la position de la camera
     glMatrixMode(GL_MODELVIEW);

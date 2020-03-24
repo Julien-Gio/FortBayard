@@ -30,7 +30,7 @@ void Player::drawPlayer(QPainter * painter, float sizeOfCase, QPoint offset){
     painter->setBrush(Qt::green);
     painter->setPen(QPen(Qt::green, sizeOfCase/5));
     const float size = sizeOfCase /2;
-    const float mapPosX = posX*sizeOfCase + offset.rx(), mapPosY = posY*sizeOfCase + offset.ry();
+    const float mapPosX = posX*sizeOfCase + offset.x(), mapPosY = posY*sizeOfCase + offset.y();
     painter->drawEllipse(mapPosX - size/2, mapPosY - size/2, size, size);
 
     const float length = size * 1.3;

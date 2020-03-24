@@ -24,22 +24,27 @@ using namespace std;
 
 using Point=pair<int,int>;
 
+
+class Collectible{
+    const float RAYON = 0.4, ROTATION_SPEED = 20;
+    bool hasBeenCollected = false;
+    GLuint textId;
+    GLUquadric* quadrique;
+    float posX = 1, posY = 1, z = 1.5;
+    float totalTime = 0;
+
+public:
+    Collectible(QString);
+    ~Collectible();
+    void display(float);
+    void setPosition(float x, float y){posX = x; posY = y;}
+};
+
+
+
+
 class Maze
 {
-    class Collectible{
-        const float RAYON = 0.4, ROTATION_SPEED = 20;
-        bool hasBeenCollected = false;
-        GLuint textId;
-        GLUquadric* quadrique;
-        float posX = 1, posY = 1, z = 1.5;
-        float totalTime = 0;
-
-    public:
-        Collectible(QString);
-        ~Collectible();
-        void display(float);
-    };
-
     std::vector<Collectible> collectibles;
     Player player;
 
