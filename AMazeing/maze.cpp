@@ -282,9 +282,18 @@ void Maze::walk(float w){
 }
 
 void Maze::removeWall(){
-    switch (0) {
+    switch (rand()%4) {
     case(0):
         grid_[0][rand()%width_].setFrontier(Cell::N, false);
+        break;
+    case(1):
+        grid_[rand()%height_][width_-1].setFrontier(Cell::E, false);
+        break;
+    case(2):
+        grid_[height_-1][rand()%width_].setFrontier(Cell::S, false);
+        break;
+    case(3):
+        grid_[rand()%height_][0].setFrontier(Cell::W, false);
         break;
     }
 }
