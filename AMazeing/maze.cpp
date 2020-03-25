@@ -346,11 +346,9 @@ void Collectible::display(float elapsedTime){
 
 
 Key::Key(Maze* m) : Collectible(QString("tse")){
-    std::cout<<"key !!!"<<std::endl;
     maze = m;
 }
 
 void Key::collected(){
-    std::cout<<"openTheDoor !!!"<<std::endl;
     maze->removeWall();
 }
