@@ -20,6 +20,7 @@ void Maze::init(){
     generate();
     collectibles.emplace_back(new Key(this));
     collectibles[0]->setPosition((int)(sizeByRoom * rand())%width_ + 1, (int)(sizeByRoom * rand())%height_ + 1);
+    player.init();
 }
 
 void Maze::reinit()
@@ -111,6 +112,8 @@ void Maze::display(){
     for(unsigned int i = 0; i < collectibles.size(); i++){
         collectibles[i]->display(10);
     }
+
+    player.displayFootPrint();
 }
 
 void Maze::drawVerticalWall(QPoint a, QPoint b){

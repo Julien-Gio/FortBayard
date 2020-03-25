@@ -19,7 +19,6 @@
 #include <GL/glu.h>
 #include <QPainter>
 #include "player.h"
-#include <QGLWidget>
 
 using namespace std;
 
