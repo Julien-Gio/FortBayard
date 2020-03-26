@@ -28,11 +28,6 @@ void Player::rotate(float r){
     yRotation += r;
 }
 
-void Player::walk(float w){
-    posX += w * std::cos(yRotation);
-    posY += w * std::sin(yRotation);
-}
-
 float Player::getRotation(){
     return yRotation;
 }
@@ -54,7 +49,7 @@ void Player::setPosition(float x, float y){
         distSinceLastPrint = 0;
         addFootPrint();
     }else{
-        distSinceLastPrint += std::sqrt(std::pow(x-posX, 2) + std::pow(y-posY, 2));
+        distSinceLastPrint += std::sqrt(std::pow(x - posX, 2) + std::pow(y - posY, 2));
     }
     posX = x;
     posY = y;
@@ -67,10 +62,10 @@ void Player::addFootPrint(){
     footPrints.back().isRightFoot = rightFoot;
     rightFoot = !rightFoot;
     if(rightFoot){
-        footPrints.back().posX = posX + printSize * std::sin(yRotation);
+        footPrints.back().posX = posX - printSize * std::sin(yRotation);
         footPrints.back().posY = posY + printSize * std::cos(yRotation);
     }else{
-        footPrints.back().posX = posX - printSize * std::sin(yRotation);
+        footPrints.back().posX = posX + printSize * std::sin(yRotation);
         footPrints.back().posY = posY - printSize * std::cos(yRotation);
     }
 }
@@ -86,10 +81,10 @@ void Player::displayFootPrint(){
         glTranslated(footPrints[i].posX, 0, footPrints[i].posY);
         glRotated(180-footPrints[i].rotation, 0, 1, 0);
         glBegin(GL_QUADS);
-            glTexCoord2f(0 + footPrints[i].isRightFoot * 0.5, 1); glVertex3f(-printSize, 0.02, -printSize/2);
-            glTexCoord2f(1 - !footPrints[i].isRightFoot * 0.5, 1); glVertex3f(-printSize, 0.02, printSize/2);
-            glTexCoord2f(1 - !footPrints[i].isRightFoot * 0.5, 0); glVertex3f(printSize, 0.02, printSize/2);
-            glTexCoord2f(0 + footPrints[i].isRightFoot * 0.5, 0); glVertex3f(printSize, 0.02, -printSize/2);
+            glTexCoord2f(0 + footPrints[i].isRightFoot * 0.5, 1); glVertex3f(-printSize, 0.01, -printSize/2);
+            glTexCoord2f(1 - !footPrints[i].isRightFoot * 0.5, 1); glVertex3f(-printSize, 0.01, printSize/2);
+            glTexCoord2f(1 - !footPrints[i].isRightFoot * 0.5, 0); glVertex3f(printSize, 0.01, printSize/2);
+            glTexCoord2f(0 + footPrints[i].isRightFoot * 0.5, 0); glVertex3f(printSize, 0.01, -printSize/2);
         glEnd();
         glPopMatrix();
     }

@@ -30,7 +30,6 @@ public:
     void init();
     void setCamera();
     void rotate(float);
-    void walk(float);
     float getRotation();
     void drawPlayer(QPainter *, float sizeOfCase, QPoint offset);
     float getPosX(){return posX;}
