@@ -73,6 +73,10 @@ Cell::Direction Maze::direction(Point f, Point t)
 
 void Maze::display(){
 
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     player.setCamera();
 
     float gray[4] = {0.8, 0.8, 0.8, 1};
@@ -113,6 +117,7 @@ void Maze::display(){
         collectibles[i]->display(10);
     }
 
+    glDisable(GL_BLEND);
     player.displayFootPrint();
 }
 
@@ -214,26 +219,28 @@ void Maze::generate()
 }
 
 void Maze::drawMap(QPainter *painter){
-    painter->fillRect(offset.x(), offset.y(), sizeOfCaseOnMap * width_, sizeOfCaseOnMap * height_, QBrush(QColor(0, 0, 0, 120)));
-    painter->setBrush(Qt::white);
-    painter->setPen(QPen(Qt::white, 2));
-    for (unsigned int i=0;i<height_;i++) {
-        if(grid_[i][0].isFrontier(Cell::W))
-            painter->drawLine(sizeOfCaseOnMap*QPoint(0, i) + offset, sizeOfCaseOnMap*QPoint(0, i + 1) + offset);
-        for (unsigned int j=0;j<width_;j++) {
-            if (grid_[i][j].isFrontier(Cell::E)){
-                painter->drawLine(sizeOfCaseOnMap*QPoint(j + 1, i) + offset, sizeOfCaseOnMap*QPoint(j + 1, i + 1) + offset);
+    if(!isPlayerMoving){
+        painter->fillRect(offset.x(), offset.y(), sizeOfCaseOnMap * width_, sizeOfCaseOnMap * height_, QBrush(QColor(0, 0, 0, 120)));
+        painter->setBrush(Qt::white);
+        painter->setPen(QPen(Qt::white, 2));
+        for (unsigned int i=0;i<height_;i++) {
+            if(grid_[i][0].isFrontier(Cell::W))
+                painter->drawLine(sizeOfCaseOnMap*QPoint(0, i) + offset, sizeOfCaseOnMap*QPoint(0, i + 1) + offset);
+            for (unsigned int j=0;j<width_;j++) {
+                if (grid_[i][j].isFrontier(Cell::E)){
+                    painter->drawLine(sizeOfCaseOnMap*QPoint(j + 1, i) + offset, sizeOfCaseOnMap*QPoint(j + 1, i + 1) + offset);
+                }
+                if (grid_[i][j].isFrontier(Cell::S))
+                    painter->drawLine(sizeOfCaseOnMap*QPoint(j, i + 1) + offset, sizeOfCaseOnMap*QPoint(j + 1, i + 1) + offset);
             }
-            if (grid_[i][j].isFrontier(Cell::S))
-                painter->drawLine(sizeOfCaseOnMap*QPoint(j, i + 1) + offset, sizeOfCaseOnMap*QPoint(j + 1, i + 1) + offset);
         }
-    }
-    for (unsigned int j=0;j<width_;j++) {
-        if (grid_[0][j].isFrontier(Cell::N))
-            painter->drawLine(sizeOfCaseOnMap*QPoint(j, 0) + offset, sizeOfCaseOnMap*QPoint(j + 1, 0) + offset);
-    }
+        for (unsigned int j=0;j<width_;j++) {
+            if (grid_[0][j].isFrontier(Cell::N))
+                painter->drawLine(sizeOfCaseOnMap*QPoint(j, 0) + offset, sizeOfCaseOnMap*QPoint(j + 1, 0) + offset);
+        }
 
-    player.drawPlayer(painter, sizeOfCaseOnMap/sizeByRoom, offset);
+        player.drawPlayer(painter, sizeOfCaseOnMap/sizeByRoom, offset);
+    }
 }
 
 bool Maze::tryFrontier(int x, int y, Cell::Direction d){
@@ -245,10 +252,12 @@ bool Maze::tryFrontier(int x, int y, Cell::Direction d){
 }
 
 void Maze::rotate(float r){
+    isPlayerMoving = true;
     player.rotate(r);
 }
 
 void Maze::walk(float w){
+    isPlayerMoving = true;
     const float hitboxSize = 0.3;
     float newX = player.getPosX() + w * std::cos(player.getRotation());
     float newY = player.getPosY() +  w * std::sin(player.getRotation());
@@ -332,13 +341,12 @@ void Collectible::display(float elapsedTime){
 
     float white[4] = {1, 1, 1, 1};
     float black[4] = {0, 0, 0, 1};
+
+    // On dessine une seconde sphère texturée qui ne se voit pas derrière un mur
     glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, white);
 
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, textId); // On définit la texture courante
-    glTranslated(posX, z + 0.1 * std::sin(totalTime/300.f), posY);
-    glRotatef(360 * std::fmod(totalTime/4000.f, 1), 0, 1, 0);
-    glRotatef(-90, 1, 0, 0);
 
     gluSphere(quadrique, RAYON, 50, 50);
     glDisable(GL_TEXTURE_2D);
@@ -354,4 +362,41 @@ Key::Key(Maze* m) : Collectible(QString("tse")){
 
 void Key::collected(){
     maze->removeWall();
+}
+
+void Key::display(float elapsedTime){
+    totalTime += elapsedTime;
+    glPushMatrix();
+
+    glTranslated(posX, z + 0.1 * std::sin(totalTime/300.f), posY);
+    glRotatef(360 * std::fmod(totalTime/4000.f, 1), 0, 1, 0);
+    glRotatef(-90, 1, 0, 0);
+
+    float white[4] = {1, 1, 1, 1};
+    float black[4] = {0, 0, 0, 1};
+    if(seeThroughWall){
+        /* On dessine une première sphère qui se voit à travers les murs et qui a une couleur orange*/
+        glDisable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glDisable(GL_LIGHTING);
+        glColor4f(1, 0.6, 0.2, 0.6);
+
+        gluSphere(quadrique, RAYON, 50, 50);
+        glEnable(GL_DEPTH_TEST);
+        glDisable(GL_CULL_FACE);
+        glEnable(GL_LIGHTING);
+    }
+
+    // On dessine une seconde sphère texturée qui ne se voit pas derrière un mur
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, white);
+
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, textId); // On définit la texture courante
+
+    gluSphere(quadrique, RAYON, 50, 50);
+    glDisable(GL_TEXTURE_2D);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, black);
+
+    glPopMatrix();
 }

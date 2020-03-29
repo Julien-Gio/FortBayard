@@ -26,6 +26,7 @@ using Point=pair<int,int>;
 
 
 class Collectible{
+protected:
     float RAYON = 0.4, ROTATION_SPEED = 20;
     bool hasBeenCollected = false;
     GLuint textId;
@@ -36,7 +37,7 @@ class Collectible{
 public:
     Collectible(QString);
     ~Collectible();
-    void display(float);
+    virtual void display(float);
     void setPosition(float x, float y){posX = x; posY = y;}
     virtual void collected(){}
     float getX(){return posX;}
@@ -49,6 +50,13 @@ class Maze
     Player player;
 
     vector<vector<Cell>> grid_;
+
+    struct Wall{
+        QPoint debut, fin;
+    };
+
+    std::vector<Wall> walls;
+    bool isPlayerMoving = false;
 
     const float wallHeight = 3;
     const float wallDepth = 0.2;
@@ -77,6 +85,7 @@ public:
     bool tryFrontier(int, int, Cell::Direction);
     void rotate(float);
     void walk(float);
+    void idle(){isPlayerMoving = false;}
     void removeWall();
 
 private:
@@ -85,10 +94,12 @@ private:
 };
 
 class Key : public Collectible{
+    bool seeThroughWall = true;
     Maze * maze;
 public:
     Key(Maze*);
-    void collected();
+    void collected() override;
+    void display(float) override;
 };
 
 #endif // MAZE_H

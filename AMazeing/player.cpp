@@ -76,6 +76,7 @@ void Player::displayFootPrint(){
     glDisable(GL_LIGHTING);
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, footPrintTexture); // On définit la texture courante
+    glColor3ub(255, 255, 255);
     for(unsigned int i = 0; i < footPrints.size(); i++){
         glPushMatrix();
         glTranslated(footPrints[i].posX, 0, footPrints[i].posY);
