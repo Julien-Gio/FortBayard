@@ -99,17 +99,6 @@ void MyGLWidget::keyPressEvent(QKeyEvent * event)
 {
     switch(event->key())
     {
-        // Activation/Arret de l'animation
-        case Qt::Key_Enter:
-        {
-            if(m_AnimationTimer.isActive())
-                m_AnimationTimer.stop();
-            else
-                m_AnimationTimer.start();
-
-            break;
-        }
-
         // Sortie de l'application
         case Qt::Key_Escape:
         {
@@ -152,4 +141,30 @@ void MyGLWidget::keyPressEvent(QKeyEvent * event)
     // Acceptation de l'evenement et mise a jour de la scene
     event->accept();
     update();
+}
+
+// Fonction de gestion d'interactions clavier
+void MyGLWidget::keyReleaseEvent(QKeyEvent * event)
+{
+    switch(event->key())
+    {
+
+        case Qt::Key_Down:
+        case Qt::Key_Up:
+        case Qt::Key_Left:
+        case Qt::Key_Right:
+        {
+            maze.idle();
+            break;
+        }
+
+        // Cas par defaut
+        default:
+        {
+            // Ignorer l'evenement
+            event->ignore();
+            return;
+        }
+    }
+    event->accept();
 }

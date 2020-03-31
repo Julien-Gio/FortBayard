@@ -19,6 +19,7 @@
 #include <GL/glu.h>
 #include <QPainter>
 #include "player.h"
+#include <QElapsedTimer>
 
 using namespace std;
 
@@ -55,6 +56,8 @@ class Maze
         QPoint debut, fin;
     };
 
+    QElapsedTimer timer;
+
     std::vector<Wall> walls;
     bool isPlayerMoving = false;
 
@@ -74,7 +77,7 @@ class Maze
     Cell::Direction direction(Point f, Point t);
 
 public:
-    Maze(int width = 10, int height = 10);
+    Maze(int width = 10, int height = 6);
     void reinit();
     void display();
     void generate();
@@ -101,5 +104,7 @@ public:
     void collected() override;
     void display(float) override;
 };
+
+QString intToStringHourFormat(long int);
 
 #endif // MAZE_H

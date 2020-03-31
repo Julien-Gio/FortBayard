@@ -216,6 +216,7 @@ void Maze::generate()
         // Mark the cell and add the frontier cells to the list
         mark(f,frontier);
     }
+    timer.start();
 }
 
 void Maze::drawMap(QPainter *painter){
@@ -241,6 +242,20 @@ void Maze::drawMap(QPainter *painter){
 
         player.drawPlayer(painter, sizeOfCaseOnMap/sizeByRoom, offset);
     }
+
+    QFont font = painter->font() ;
+    font.setPointSize(font.pointSize() * 2);
+    painter->setFont(font);
+
+    painter->setPen(QPen(Qt::white, 20));
+    long int time = timer.elapsed();
+    QString hour;
+    hour.append(intToStringHourFormat(time/60000) + " : ");
+    time -= (time/60000)*60000;
+    hour.append(intToStringHourFormat(time/1000) + " : ");
+    time -= (time/1000)*1000;
+    hour.append(intToStringHourFormat(time));
+    painter->drawText(offset.x() + sizeOfCaseOnMap * width_ + 20, 4 * offset.y(), QString(hour));
 }
 
 bool Maze::tryFrontier(int x, int y, Cell::Direction d){
@@ -291,6 +306,8 @@ void Maze::walk(float w){
     }
 
     player.setPosition(newX, newY);
+    if(newX < 0 || newX > width_ * sizeByRoom || newY < 0 || newY > height_ * sizeByRoom)
+        timer.restart();
 }
 
 void Maze::removeWall(){
@@ -399,4 +416,12 @@ void Key::display(float elapsedTime){
     glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, black);
 
     glPopMatrix();
+}
+
+QString intToStringHourFormat(long int v){
+    QString time;
+    if(v < 10)
+        time.append("0");
+    time.append(QString::number(v));
+    return time;
 }
