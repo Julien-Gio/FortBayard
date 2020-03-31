@@ -12,13 +12,14 @@
 #include <list>
 #include <utility>
 #include <QPoint>
+#include<iostream>
 
 #include <qopengl.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <QPainter>
 #include "player.h"
-#include <QGLWidget>
+#include <QElapsedTimer>
 
 using namespace std;
 
@@ -26,7 +27,8 @@ using Point=pair<int,int>;
 
 
 class Collectible{
-    const float RAYON = 0.4, ROTATION_SPEED = 20;
+protected:
+    float RAYON = 0.4, ROTATION_SPEED = 20;
     bool hasBeenCollected = false;
     GLuint textId;
     GLUquadric* quadrique;
@@ -36,19 +38,28 @@ class Collectible{
 public:
     Collectible(QString);
     ~Collectible();
-    void display(float);
+    virtual void display(float);
     void setPosition(float x, float y){posX = x; posY = y;}
+    virtual void collected(){}
+    float getX(){return posX;}
+    float getY(){return posY;}
 };
-
-
-
 
 class Maze
 {
-    std::vector<Collectible> collectibles;
+    std::vector<Collectible*> collectibles;
     Player player;
 
     vector<vector<Cell>> grid_;
+
+    struct Wall{
+        QPoint debut, fin;
+    };
+
+    QElapsedTimer timer;
+
+    std::vector<Wall> walls;
+    bool isPlayerMoving = false;
 
     const float wallHeight = 3;
     const float wallDepth = 0.2;
@@ -66,7 +77,7 @@ class Maze
     Cell::Direction direction(Point f, Point t);
 
 public:
-    Maze(int width = 10, int height = 10);
+    Maze(int width = 10, int height = 6);
     void reinit();
     void display();
     void generate();
@@ -77,10 +88,23 @@ public:
     bool tryFrontier(int, int, Cell::Direction);
     void rotate(float);
     void walk(float);
+    void idle(){isPlayerMoving = false;}
+    void removeWall();
 
 private:
     void drawVerticalWall(QPoint, QPoint);
     void drawHorizontalWall(QPoint, QPoint);
 };
+
+class Key : public Collectible{
+    bool seeThroughWall = true;
+    Maze * maze;
+public:
+    Key(Maze*);
+    void collected() override;
+    void display(float) override;
+};
+
+QString intToStringHourFormat(long int);
 
 #endif // MAZE_H

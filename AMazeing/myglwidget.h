@@ -31,6 +31,7 @@ protected:
     void paintEvent(QPaintEvent *event);
     void resizeGL(int width, int height);
     void keyPressEvent(QKeyEvent*);
+    void keyReleaseEvent(QKeyEvent*);
 
 private:
     QTimer m_AnimationTimer;

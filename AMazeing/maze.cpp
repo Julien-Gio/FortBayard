@@ -4,7 +4,6 @@
  * C++ implementation by C. Ducottet
 **/
 
-#include<iostream>
 #include <vector>
 #include <ctime>
 #include "cell.h"
@@ -20,8 +19,9 @@ Maze::Maze(int width, int height)
 
 void Maze::init(){
     generate();
-    collectibles.emplace_back("tse");
-    collectibles[0].setPosition((int)(sizeByRoom * rand())%width_ + 1, (int)(sizeByRoom * rand())%height_ + 1);
+    collectibles.emplace_back(new Key(this));
+    collectibles[0]->setPosition((int)(sizeByRoom * rand())%width_ + 1, (int)(sizeByRoom * rand())%height_ + 1);
+    player.init();
 }
 
 void Maze::reinit()
@@ -74,6 +74,10 @@ Cell::Direction Maze::direction(Point f, Point t)
 
 void Maze::display(){
 
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     player.setCamera();
 
     float gray[4] = {0.8, 0.8, 0.8, 1};
@@ -111,8 +115,11 @@ void Maze::display(){
     }
 
     for(unsigned int i = 0; i < collectibles.size(); i++){
-        collectibles[i].display(10);
+        collectibles[i]->display(10);
     }
+
+    glDisable(GL_BLEND);
+    player.displayFootPrint();
 }
 
 void Maze::drawVerticalWall(QPoint a, QPoint b){
@@ -210,59 +217,115 @@ void Maze::generate()
         // Mark the cell and add the frontier cells to the list
         mark(f,frontier);
     }
+    timer.start();
 }
 
 void Maze::drawMap(QPainter *painter){
-    painter->fillRect(offset.x(), offset.y(), sizeOfCaseOnMap * width_, sizeOfCaseOnMap * height_, QBrush(QColor(0, 0, 0, 120)));
-    painter->setBrush(Qt::white);
-    painter->setPen(QPen(Qt::white, 2));
-    for (unsigned int i=0;i<height_;i++) {
-        if(grid_[i][0].isFrontier(Cell::W))
-            painter->drawLine(sizeOfCaseOnMap*QPoint(0, i) + offset, sizeOfCaseOnMap*QPoint(0, i + 1) + offset);
-        for (unsigned int j=0;j<width_;j++) {
-            if (grid_[i][j].isFrontier(Cell::E)){
-                painter->drawLine(sizeOfCaseOnMap*QPoint(j + 1, i) + offset, sizeOfCaseOnMap*QPoint(j + 1, i + 1) + offset);
+    if(!isPlayerMoving){
+        painter->fillRect(offset.x(), offset.y(), sizeOfCaseOnMap * width_, sizeOfCaseOnMap * height_, QBrush(QColor(0, 0, 0, 120)));
+        painter->setBrush(Qt::white);
+        painter->setPen(QPen(Qt::white, 2));
+        for (unsigned int i=0;i<height_;i++) {
+            if(grid_[i][0].isFrontier(Cell::W))
+                painter->drawLine(sizeOfCaseOnMap*QPoint(0, i) + offset, sizeOfCaseOnMap*QPoint(0, i + 1) + offset);
+            for (unsigned int j=0;j<width_;j++) {
+                if (grid_[i][j].isFrontier(Cell::E)){
+                    painter->drawLine(sizeOfCaseOnMap*QPoint(j + 1, i) + offset, sizeOfCaseOnMap*QPoint(j + 1, i + 1) + offset);
+                }
+                if (grid_[i][j].isFrontier(Cell::S))
+                    painter->drawLine(sizeOfCaseOnMap*QPoint(j, i + 1) + offset, sizeOfCaseOnMap*QPoint(j + 1, i + 1) + offset);
             }
-            if (grid_[i][j].isFrontier(Cell::S))
-                painter->drawLine(sizeOfCaseOnMap*QPoint(j, i + 1) + offset, sizeOfCaseOnMap*QPoint(j + 1, i + 1) + offset);
         }
-    }
-    for (unsigned int j=0;j<width_;j++) {
-        if (grid_[0][j].isFrontier(Cell::N))
-            painter->drawLine(sizeOfCaseOnMap*QPoint(j, 0) + offset, sizeOfCaseOnMap*QPoint(j + 1, 0) + offset);
+        for (unsigned int j=0;j<width_;j++) {
+            if (grid_[0][j].isFrontier(Cell::N))
+                painter->drawLine(sizeOfCaseOnMap*QPoint(j, 0) + offset, sizeOfCaseOnMap*QPoint(j + 1, 0) + offset);
+        }
+
+        player.drawPlayer(painter, sizeOfCaseOnMap/sizeByRoom, offset);
     }
 
-    player.drawPlayer(painter, sizeOfCaseOnMap/sizeByRoom, offset);
+    QFont font = painter->font() ;
+    font.setPointSize(font.pointSize() * 2);
+    painter->setFont(font);
+
+    painter->setPen(QPen(Qt::white, 20));
+    long int time = timer.elapsed();
+    QString hour;
+    hour.append(intToStringHourFormat(time/60000) + " : ");
+    time -= (time/60000)*60000;
+    hour.append(intToStringHourFormat(time/1000) + " : ");
+    time -= (time/1000)*1000;
+    hour.append(intToStringHourFormat(time));
+    painter->drawText(offset.x() + sizeOfCaseOnMap * width_ + 20, 4 * offset.y(), QString(hour));
+}
+
+bool Maze::tryFrontier(int x, int y, Cell::Direction d){
+    if(x >= 0 && x < width_ && y >= 0 && y < height_){
+        if(grid_[y][x].isFrontier(d))
+            return true;
+    }
+    return false;
 }
 
 void Maze::rotate(float r){
+    isPlayerMoving = true;
     player.rotate(r);
 }
 
 void Maze::walk(float w){
+    isPlayerMoving = true;
     const float hitboxSize = 0.3;
     float newX = player.getPosX() + w * std::cos(player.getRotation());
     float newY = player.getPosY() +  w * std::sin(player.getRotation());
 
     if(std::fmod(newX, sizeByRoom) <= hitboxSize){
-        if(grid_[std::floor(newY/sizeByRoom)][std::floor(newX/sizeByRoom)].isFrontier(Cell::W)){
+        if(tryFrontier(std::floor(newX/sizeByRoom), std::floor(newY/sizeByRoom), Cell::W)){
             newX = std::floor(newX/sizeByRoom)*sizeByRoom + hitboxSize;
         }
     }else if(std::fmod(newX, sizeByRoom) >= sizeByRoom - hitboxSize){
-        if(grid_[std::floor(newY/sizeByRoom)][std::floor(newX/sizeByRoom)].isFrontier(Cell::E)){
+        if(tryFrontier(std::floor(newX/sizeByRoom), std::floor(newY/sizeByRoom), Cell::E)){
             newX = std::floor(newX/sizeByRoom)*sizeByRoom + sizeByRoom - hitboxSize;
         }
     }
     if(std::fmod(newY, sizeByRoom) <= hitboxSize){
-        if(grid_[std::floor(newY/sizeByRoom)][std::floor(newX/sizeByRoom)].isFrontier(Cell::N)){
+        if(tryFrontier(std::floor(newX/sizeByRoom), std::floor(newY/sizeByRoom), Cell::N)){
             newY = std::floor(newY/sizeByRoom)*sizeByRoom + hitboxSize;
         }
     }else if(std::fmod(newY, sizeByRoom) >= sizeByRoom - hitboxSize){
-        if(grid_[std::floor(newY/sizeByRoom)][std::floor(newX/sizeByRoom)].isFrontier(Cell::S)){
+        if(tryFrontier(std::floor(newX/sizeByRoom), std::floor(newY/sizeByRoom), Cell::S)){
             newY = std::floor(newY/sizeByRoom)*sizeByRoom + sizeByRoom - hitboxSize;
         }
     }
+
+    for(unsigned int i = 0; i < collectibles.size(); i++){
+        if(abs(newX - collectibles[i]->getX()) < hitboxSize && abs(newY - collectibles[i]->getY()) < hitboxSize){
+            collectibles[i]->collected();
+            delete collectibles[i];
+            collectibles.erase(collectibles.begin() + i);
+            i--;
+        }
+    }
+
     player.setPosition(newX, newY);
+    if(newX < 0 || newX > width_ * sizeByRoom || newY < 0 || newY > height_ * sizeByRoom)
+        timer.restart();
+}
+
+void Maze::removeWall(){
+    switch (rand()%4) {
+    case(0):
+        grid_[0][rand()%width_].setFrontier(Cell::N, false);
+        break;
+    case(1):
+        grid_[rand()%height_][width_-1].setFrontier(Cell::E, false);
+        break;
+    case(2):
+        grid_[height_-1][rand()%width_].setFrontier(Cell::S, false);
+        break;
+    case(3):
+        grid_[rand()%height_][0].setFrontier(Cell::W, false);
+        break;
+    }
 }
 
 
@@ -296,17 +359,70 @@ void Collectible::display(float elapsedTime){
 
     float white[4] = {1, 1, 1, 1};
     float black[4] = {0, 0, 0, 1};
+
+    // On dessine une seconde sphère texturée qui ne se voit pas derrière un mur
     glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, white);
 
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, textId); // On définit la texture courante
-    glTranslated(posX, z + 0.1 * std::sin(totalTime/300.f), posY);
-    glRotatef(360 * std::fmod(totalTime/4000.f, 1), 0, 1, 0);
-    glRotatef(-90, 1, 0, 0);
 
     gluSphere(quadrique, RAYON, 50, 50);
     glDisable(GL_TEXTURE_2D);
     glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, black);
 
     glPopMatrix();
+}
+
+
+Key::Key(Maze* m) : Collectible(QString("tse")){
+    maze = m;
+}
+
+void Key::collected(){
+    maze->removeWall();
+}
+
+void Key::display(float elapsedTime){
+    totalTime += elapsedTime;
+    glPushMatrix();
+
+    glTranslated(posX, z + 0.1 * std::sin(totalTime/300.f), posY);
+    glRotatef(360 * std::fmod(totalTime/4000.f, 1), 0, 1, 0);
+    glRotatef(-90, 1, 0, 0);
+
+    float white[4] = {1, 1, 1, 1};
+    float black[4] = {0, 0, 0, 1};
+    if(seeThroughWall){
+        /* On dessine une première sphère qui se voit à travers les murs et qui a une couleur orange*/
+        glDisable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glDisable(GL_LIGHTING);
+        glColor4f(1, 0.6, 0.2, 0.6);
+
+        gluSphere(quadrique, RAYON, 50, 50);
+        glEnable(GL_DEPTH_TEST);
+        glDisable(GL_CULL_FACE);
+        glEnable(GL_LIGHTING);
+    }
+
+    // On dessine une seconde sphère texturée qui ne se voit pas derrière un mur
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, white);
+
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, textId); // On définit la texture courante
+
+    gluSphere(quadrique, RAYON, 50, 50);
+    glDisable(GL_TEXTURE_2D);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, black);
+
+    glPopMatrix();
+}
+
+QString intToStringHourFormat(long int v){
+    QString time;
+    if(v < 10)
+        time.append("0");
+    time.append(QString::number(v));
+    return time;
 }
