@@ -19,7 +19,9 @@ Maze::Maze(int width, int height)
 void Maze::init(){
     generate();
     collectibles.emplace_back(new Key(this));
-    collectibles[0]->setPosition((int)(sizeByRoom * rand())%width_ + 1, (int)(sizeByRoom * rand())%height_ + 1);
+    collectibles.back()->setPosition((int)(sizeByRoom * rand())%width_ + 1, (int)(sizeByRoom * rand())%height_ + 1);
+    collectibles.emplace_back(new Glasses(dynamic_cast<Key*>(collectibles[0])));
+    collectibles.back()->setPosition((int)(sizeByRoom * rand())%width_ + 1, (int)(sizeByRoom * rand())%height_ + 1);
     player.init();
 }
 
@@ -297,8 +299,19 @@ void Maze::walk(float w){
     }
 
     for(unsigned int i = 0; i < collectibles.size(); i++){
-        if(abs(newX - collectibles[i]->getX()) < hitboxSize && abs(newY - collectibles[i]->getY()) < hitboxSize){
+        if(abs(newX - collectibles[i]->getX()) < 2 * hitboxSize && abs(newY - collectibles[i]->getY()) < 2 * hitboxSize){
             collectibles[i]->collected();
+            // On prévient tous les objets qu'un objet a été collecté. Les objets ayant un lien avec cet objet passe le pointeur vers celui-ci à null
+            // De plus, si ils n'ont plus aucun lien avec aucun objet, alors il mette la variable d'autodestruction à true.
+            for(unsigned int j = 0; j < collectibles.size(); j++){
+                collectibles[j]->thisObjectHasBeenCollected(collectibles[i]);
+            }
+        }
+    }
+
+    // Les objets qui on été collectés ou dont les effets s'appliquent à des objets déjà collectés retourne true à la fonction HasBeenCollected
+    for(unsigned int i = 0; i < collectibles.size(); i++){
+        if(collectibles[i]->HasBeenCollected()){
             delete collectibles[i];
             collectibles.erase(collectibles.begin() + i);
             i--;
@@ -331,18 +344,19 @@ void Maze::removeWall(){
 
 /* Collectibles */
 Collectible::Collectible(QString imageName){
+    if(imageName != "none"){
+        quadrique = gluNewQuadric();
+        gluQuadricTexture(quadrique, GL_TRUE);
 
-    quadrique = gluNewQuadric();
-    gluQuadricTexture(quadrique, GL_TRUE);
+        QString path = QString(":/tse.png");
+        QImage image = QGLWidget::convertToGLFormat(QImage(path));
+        glGenTextures(1, &textId);
+        glBindTexture(GL_TEXTURE_2D, textId);
+        glTexImage2D(GL_TEXTURE_2D, 0, 4, image.width(), image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
 
-    QString path = QString(":/tse.png");
-    QImage image = QGLWidget::convertToGLFormat(QImage(path));
-    glGenTextures(1, &textId);
-    glBindTexture(GL_TEXTURE_2D, textId);
-    glTexImage2D(GL_TEXTURE_2D, 0, 4, image.width(), image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
-
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    }
 
     totalTime = (rand()%1000)/500.f;
 }
@@ -378,6 +392,7 @@ Key::Key(Maze* m) : Collectible(QString("tse")){
 }
 
 void Key::collected(){
+    hasBeenCollected = true;
     maze->removeWall();
 }
 
@@ -416,6 +431,86 @@ void Key::display(float elapsedTime){
     glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, black);
 
     glPopMatrix();
+}
+
+Glasses::Glasses(Key* k) : Collectible("none"){
+    key = k;
+}
+
+void Glasses::display(float elapsedTime){
+    totalTime += elapsedTime;
+    glPushMatrix();
+
+    glTranslated(posX, z + 0.1 * std::sin(totalTime/300.f), posY);
+    glRotatef(360 * std::fmod(totalTime/4000.f, 1), 0, 1, 0);
+
+    glDisable(GL_LIGHTING);
+    // Draw here
+    float width = 0.6, height = 0.6, glassSize = 0.2;
+    glColor3ub(20, 30, 20);
+    glBegin(GL_QUADS);
+        glVertex3f(-width/2, -glassSize/4, -height/2);
+        glVertex3f(-width/2, +glassSize/4, -height/2);
+        glVertex3f(-width/2, +glassSize/4, height/2);
+        glVertex3f(-width/2, -glassSize/4, height/2);
+
+        glVertex3f(width/2, -glassSize/4, -height/2);
+        glVertex3f(width/2, +glassSize/4, -height/2);
+        glVertex3f(width/2, +glassSize/4, height/2);
+        glVertex3f(width/2, -glassSize/4, height/2);
+
+        glColor3ub(50, 30, 180);
+        glVertex3f(width/2 - 4*width/10, +glassSize/8, height/2);
+        glVertex3f(width/2 - 4*width/10, -glassSize/8, height/2);
+        glVertex3f(width/2 - 6*width/10, -glassSize/8, height/2);
+        glVertex3f(width/2 - 6*width/10, +glassSize/8, height/2);
+    glEnd();
+    glBegin(GL_QUAD_STRIP);
+        glVertex3f(width/2, +glassSize/2, height/2);
+        glVertex3f(width/2-width/10, glassSize/2-glassSize/6, height/2);
+        glVertex3f(width/2, -glassSize/2, height/2);
+        glVertex3f(width/2-width/10, -glassSize/2+glassSize/6, height/2);
+
+        glVertex3f(width/2-4*width/10, -glassSize/2, height/2);
+        glVertex3f(width/2-3*width/10, -glassSize/2+glassSize/6, height/2);
+
+        glVertex3f(width/2-4*width/10, +glassSize/2, height/2);
+        glVertex3f(width/2-3*width/10, +glassSize/2-glassSize/6, height/2);
+
+        glVertex3f(width/2, +glassSize/2, height/2);
+        glVertex3f(width/2-width/10, glassSize/2-glassSize/6, height/2);
+    glEnd();
+    glBegin(GL_QUAD_STRIP);
+        glVertex3f(-width/2, +glassSize/2, height/2);
+        glVertex3f(-width/2+width/10, glassSize/2-glassSize/6, height/2);
+        glVertex3f(-width/2, -glassSize/2, height/2);
+        glVertex3f(-width/2+width/10, -glassSize/2+glassSize/6, height/2);
+
+        glVertex3f(-width/2+4*width/10, -glassSize/2, height/2);
+        glVertex3f(-width/2+3*width/10, -glassSize/2+glassSize/6, height/2);
+
+        glVertex3f(-width/2+4*width/10, +glassSize/2, height/2);
+        glVertex3f(-width/2+3*width/10, +glassSize/2-glassSize/6, height/2);
+
+        glVertex3f(-width/2, +glassSize/2, height/2);
+        glVertex3f(-width/2+width/10, glassSize/2-glassSize/6, height/2);
+    glEnd();
+    glEnable(GL_LIGHTING);
+
+    glPopMatrix();
+}
+
+void Glasses::collected(){
+    hasBeenCollected = true;
+    if(key != nullptr)
+        key->seeThrough();
+}
+
+void Glasses::thisObjectHasBeenCollected(Collectible * c){
+    if(c == key){
+        key = nullptr;
+        destroyIt();
+    }
 }
 
 QString intToStringHourFormat(long int v){
