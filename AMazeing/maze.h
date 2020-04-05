@@ -77,7 +77,7 @@ class Maze
     Cell::Direction direction(Point f, Point t);
 
 public:
-    Maze(int width = 10, int height = 6);
+    Maze();
     void reinit();
     void display();
     void generate();

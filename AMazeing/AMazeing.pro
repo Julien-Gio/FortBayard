@@ -34,6 +34,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     maze.cpp \
+    menuwindow.cpp \
     myglwidget.cpp \
     player.cpp
 
@@ -42,11 +43,13 @@ HEADERS += \
     facehandler.h \
     mainwindow.h \
     maze.h \
+    menuwindow.h \
     myglwidget.h \
     player.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    menuwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

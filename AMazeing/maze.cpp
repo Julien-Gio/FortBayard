@@ -8,13 +8,23 @@
 #include <ctime>
 #include "cell.h"
 #include "maze.h"
+#include "menuwindow.h"
 
 using namespace std;
 
-Maze::Maze(int width, int height)
-    : grid_(height,vector<Cell>(width)), width_(width), height_(height)
+Maze::Maze()
 {
-    cout << "eeeeeee" << endl;
+    if (MenuWindow::diff == 'E') {
+        width_ = 6;
+        height_ = 4;
+    } else if (MenuWindow::diff == 'N') {
+        width_ = 10;
+        height_ = 6;
+    } else {
+        width_ = 14;
+        height_ = 10;
+    }
+    reinit();
 }
 
 void Maze::init(){

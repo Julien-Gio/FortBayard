@@ -144,9 +144,14 @@ void FaceHandler::updateC(Rect& face) {
     }
     if (vect.y >= SEUILS[BAS]) { // Bas
         dir.y = 1;
+        maze->idle();
     } else if (vect.y <= -SEUILS[HAUT]) { // Haut
         dir.y = -1;
         maze->walk(WALK_SPEED);
+    }
+
+    if (dir.x == 0 && dir.y != 1) {
+        maze->idle();
     }
 
     // Draw the direction

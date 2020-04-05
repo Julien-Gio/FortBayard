@@ -7,6 +7,7 @@
 #include "myglwidget.h"
 #include <GL/glu.h>
 
+#include <iostream>
 
 #ifndef GL_MULTISAMPLE
 #define GL_MULTISAMPLE  0x809D
@@ -101,41 +102,31 @@ void MyGLWidget::keyPressEvent(QKeyEvent * event)
     {
         // Sortie de l'application
         case Qt::Key_Escape:
-        {
-            exit(0);
-        }
+            setAttribute(Qt::WA_DeleteOnClose, true);
+            close();
+            break;
 
         case Qt::Key_Right:
-        {
             maze.rotate(10 * 3.14159 / 180);
             break;
-        }
 
         case Qt::Key_Left:
-        {
             maze.rotate(-10 * 3.14159 / 180);
             break;
-        }
 
         case Qt::Key_Up:
-        {
             maze.walk(0.1);
             break;
-        }
 
         case Qt::Key_Down:
-        {
             maze.walk(-0.1);
             break;
-        }
 
         // Cas par defaut
         default:
-        {
             // Ignorer l'evenement
             event->ignore();
             return;
-        }
     }
 
     // Acceptation de l'evenement et mise a jour de la scene
