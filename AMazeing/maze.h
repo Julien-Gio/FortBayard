@@ -39,12 +39,12 @@ protected:
 public:
     Collectible(QString);
     ~Collectible();
-    virtual void display(float);
+    virtual void display(float); // Role: Affiche en 3D l'objet dans l'espace. Entrée: le temps écoulé depuis la dernière frame
     void setPosition(float x, float y){posX = x; posY = y;}
-    virtual void collected(){hasBeenCollected = true;}
+    virtual void collected(){hasBeenCollected = true;} // Role: Effectuer une action sur un autre objet et mettre à true le booleen hasBeenCollected
     bool HasBeenCollected(){return hasBeenCollected;}
-    void destroyIt(){hasBeenCollected = true;}
-    virtual void thisObjectHasBeenCollected(Collectible*){}
+    void destroyIt(){hasBeenCollected = true;} // Role: Mettre à true le booleen hasBeenCollected sans qu'il ai été ramassé
+    virtual void thisObjectHasBeenCollected(Collectible*){} // Role: Signaler aux autres objets quel objet vient d'être ramasser pour pouvoir se détruire si c'est le'objet sur lequel ils devaient influer
     float getX(){return posX;}
     float getY(){return posY;}
 };
@@ -82,22 +82,22 @@ class Maze
 
 public:
     Maze(int width = 10, int height = 6);
-    void reinit();
-    void display();
-    void generate();
-    void drawMap(QPainter*);
+    void reinit(); // Role: réinitialiser le labyrinthe
+    void display(); // Role: Afficher en 3D le labyrinthe
+    void generate(); // Role: génerer un labyrinthe
+    void drawMap(QPainter*); // Role: afficher en 2D le labyrinthe en haut à gauche de l'écran. Entrée le QPainter pour dessiner
     float getSizeOfRoom(){return sizeByRoom;}
 
-    void init();
-    bool tryFrontier(int, int, Cell::Direction);
-    void rotate(float);
-    void walk(float);
-    void idle(){isPlayerMoving = false;}
-    void removeWall();
+    void init(); // Role: Initialise les objets, et le personnage à des positions aléatoire avant de générer le labyrinthe
+    bool tryFrontier(int, int, Cell::Direction); // Role: Pour une certaine case, essaye si il y a un mur dans une certaine direction. Entrée: x et y la position de la case et Cell::Direction le direction à tester
+    void rotate(float); // Role: Rotate le personnage à l'intérieur du labyrinthe. Entrée: L'angle de rotation en radian.
+    void walk(float); // Role: Fais marcher le personnage dans le labyrinthe. Entrée: La distance à parcourir.
+    void idle(){isPlayerMoving = false;} // Role: Signaler que le personnage ne doit pas bouger (ce qui permet de rafficher la minimap).
+    void removeWall(); // Role: Retire un mur sur le contour du labyrinthe de façon aléatoire.
 
 private:
-    void drawVerticalWall(QPoint, QPoint);
-    void drawHorizontalWall(QPoint, QPoint);
+    void drawVerticalWall(QPoint, QPoint); // Role: Dessine un mur vertical en 3D d'un point A à un point B. Entrée: Le point A et le point B
+    void drawHorizontalWall(QPoint, QPoint); // Role: Dessine un mur horizontal en 3D d'un point A à un point B. Entrée: Le point A et le point B
 };
 
 // La clé qui permet d'ouvrir une porte dans le labyrinthe
@@ -106,10 +106,10 @@ class Key : public Collectible{
     Maze * maze;
 public:
     Key(Maze*);
-    void collected() override;
-    void display(float) override;
-    void seeThrough(){seeThroughWall=true;}
-    void thisObjectHasBeenCollected(Collectible *) override{}
+    void collected() override; // Role: La fonction appelé quand l'objet est collecté.
+    void display(float) override; // Role: La fonction pour afficher en 3D l'objet dans la labyrinthe. Entrée: le temps écoulé depuis la dernière frame
+    void seeThrough(){seeThroughWall=true;} // Role: Une fonction permettant d'activer le fait que l'on puisse voir l'objet à travers les murs
+    void thisObjectHasBeenCollected(Collectible *) override{} // Role: La fonction permettant de signaler à cette objet, quel objet a été ramassé.
 };
 
 // Les lunettes qui permettent de voir la clé à travers les murs
@@ -117,9 +117,9 @@ class Glasses : public Collectible{
     Key* key;
 public:
     Glasses(Key*);
-    void collected() override;
-    void display(float) override;
-    void thisObjectHasBeenCollected(Collectible*) override;
+    void collected() override; // Role: La fonction appelé quand l'objet est collecté.
+    void display(float) override; // Role: La fonction pour afficher en 3D l'objet dans la labyrinthe. Entrée: le temps écoulé depuis la dernière frame
+    void thisObjectHasBeenCollected(Collectible*) override; // Role: La fonction permettant de signaler à cette objet, quel objet a été ramassé. Pour le cas des lunettes, si la clé a déjà été ramassé, alors on supprime les lunettes
 };
 
 //Fonction permettant de transformer un int sous format horaire sur une alarme par exemple 8 => "08" et 12 => "12"
