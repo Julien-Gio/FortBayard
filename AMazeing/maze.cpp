@@ -28,12 +28,12 @@ Maze::Maze()
 }
 
 void Maze::init(){
-    generate();
-    collectibles.emplace_back(new Key(this));
+    generate(); // Génere le labyrinthe
+    collectibles.emplace_back(new Key(this)); // Crée une clé que l'on positionne ensuite aléatoirement
     collectibles.back()->setPosition((int)(sizeByRoom * rand())%width_ + 1, (int)(sizeByRoom * rand())%height_ + 1);
-    collectibles.emplace_back(new Glasses(dynamic_cast<Key*>(collectibles[0])));
+    collectibles.emplace_back(new Glasses(dynamic_cast<Key*>(collectibles[0]))); // Crée des lunettes que l'on positionne ensuite aléatoirement
     collectibles.back()->setPosition((int)(sizeByRoom * rand())%width_ + 1, (int)(sizeByRoom * rand())%height_ + 1);
-    player.init();
+    player.init(); // On repositionne le joueur dans le labyrinthe
 }
 
 void Maze::reinit()
@@ -85,8 +85,6 @@ Cell::Direction Maze::direction(Point f, Point t)
 }
 
 void Maze::display(){
-
-
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -94,6 +92,7 @@ void Maze::display(){
 
     float gray[4] = {0.8, 0.8, 0.8, 1};
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, gray);
+    // Dessine le sole et la plafond
     glBegin(GL_QUADS);
         glNormal3f(0, 1, 0);
         glVertex3f(0, 0, 0); // Sol
@@ -126,6 +125,7 @@ void Maze::display(){
             drawVerticalWall(QPoint(j, 0), QPoint(j + 1, 0));
     }
 
+    // On affiche les différents objets
     for(unsigned int i = 0; i < collectibles.size(); i++){
         collectibles[i]->display(10);
     }
@@ -233,7 +233,7 @@ void Maze::generate()
 }
 
 void Maze::drawMap(QPainter *painter){
-    if(!isPlayerMoving){
+    if(!isPlayerMoving){ // Si le joueur ne bouge pas, alors on affiche la minimap
         painter->fillRect(offset.x(), offset.y(), sizeOfCaseOnMap * width_, sizeOfCaseOnMap * height_, QBrush(QColor(0, 0, 0, 120)));
         painter->setBrush(Qt::white);
         painter->setPen(QPen(Qt::white, 2));
@@ -256,6 +256,7 @@ void Maze::drawMap(QPainter *painter){
         player.drawPlayer(painter, sizeOfCaseOnMap/sizeByRoom, offset);
     }
 
+    // Ici on affiche la chronomètre à droite de la minimap (ou de l'endroit ou elle serait affiché si elle ne l'est pas)
     QFont font = painter->font() ;
     font.setPointSize(font.pointSize() * 2);
     painter->setFont(font);
@@ -290,19 +291,23 @@ void Maze::walk(float w){
     float newX = player.getPosX() + w * std::cos(player.getRotation());
     float newY = player.getPosY() +  w * std::sin(player.getRotation());
 
+    // Si on est proche de la zone gauche de la case, on test si il y a un mur et si il y en a un, alors on recule le nouveau x au niveau de la parois du mur.
     if(std::fmod(newX, sizeByRoom) <= hitboxSize){
         if(tryFrontier(std::floor(newX/sizeByRoom), std::floor(newY/sizeByRoom), Cell::W)){
             newX = std::floor(newX/sizeByRoom)*sizeByRoom + hitboxSize;
         }
+        // Si on est proche de la zone droite de la case, on test si il y a un mur et si il y en a un, alors on recule le nouveau x au niveau de la parois du mur.
     }else if(std::fmod(newX, sizeByRoom) >= sizeByRoom - hitboxSize){
         if(tryFrontier(std::floor(newX/sizeByRoom), std::floor(newY/sizeByRoom), Cell::E)){
             newX = std::floor(newX/sizeByRoom)*sizeByRoom + sizeByRoom - hitboxSize;
         }
     }
+        // Si on est proche de la zone haute de la case, on test si il y a un mur et si il y en a un, alors on recule le nouveau x au niveau de la parois du mur.
     if(std::fmod(newY, sizeByRoom) <= hitboxSize){
         if(tryFrontier(std::floor(newX/sizeByRoom), std::floor(newY/sizeByRoom), Cell::N)){
             newY = std::floor(newY/sizeByRoom)*sizeByRoom + hitboxSize;
         }
+        // Si on est proche de la zone basse de la case, on test si il y a un mur et si il y en a un, alors on recule le nouveau x au niveau de la parois du mur.
     }else if(std::fmod(newY, sizeByRoom) >= sizeByRoom - hitboxSize){
         if(tryFrontier(std::floor(newX/sizeByRoom), std::floor(newY/sizeByRoom), Cell::S)){
             newY = std::floor(newY/sizeByRoom)*sizeByRoom + sizeByRoom - hitboxSize;
@@ -330,7 +335,7 @@ void Maze::walk(float w){
     }
 
     player.setPosition(newX, newY);
-    if(newX < 0 || newX > width_ * sizeByRoom || newY < 0 || newY > height_ * sizeByRoom)
+    if(newX < 0 || newX > width_ * sizeByRoom || newY < 0 || newY > height_ * sizeByRoom) // Si on est sorti du labyrinthe
         timer.restart();
 }
 
@@ -452,13 +457,14 @@ void Glasses::display(float elapsedTime){
     totalTime += elapsedTime;
     glPushMatrix();
 
+    // Positionne l'objet à sa position et on lui fait un effet de flottement
     glTranslated(posX, z + 0.1 * std::sin(totalTime/300.f), posY);
     glRotatef(360 * std::fmod(totalTime/4000.f, 1), 0, 1, 0);
 
     glDisable(GL_LIGHTING);
-    // Draw here
     float width = 0.6, height = 0.6, glassSize = 0.2;
     glColor3ub(20, 30, 20);
+    // On dessine ici les lunettes 3D
     glBegin(GL_QUADS);
         glVertex3f(-width/2, -glassSize/4, -height/2);
         glVertex3f(-width/2, +glassSize/4, -height/2);
@@ -513,12 +519,12 @@ void Glasses::display(float elapsedTime){
 
 void Glasses::collected(){
     hasBeenCollected = true;
-    if(key != nullptr)
-        key->seeThrough();
+    if(key != nullptr) // Si la clé n'a pas encore été ramassé
+        key->seeThrough(); // On active le fait de voir la clé à travers les murs
 }
 
 void Glasses::thisObjectHasBeenCollected(Collectible * c){
-    if(c == key){
+    if(c == key){ // Si l'objet rammassé correspond à la clé, alors on doit détruire les lunettes car elles ne servent plus à rien.
         key = nullptr;
         destroyIt();
     }
