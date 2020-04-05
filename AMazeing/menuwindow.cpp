@@ -24,11 +24,6 @@ void MenuWindow::on_StartBtn_clicked() {
 }
 
 
-void MenuWindow::openMenu() {
-    show();
-}
-
-
 void MenuWindow::on_EasyBtn_clicked() {
     MenuWindow::diff = 'E';
     ui->EasyBtn->setFont(bigFont);

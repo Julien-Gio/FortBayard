@@ -17,21 +17,23 @@ public:
     explicit MenuWindow(QWidget *parent = nullptr);
     ~MenuWindow();
 
-    void openMenu();  // Call this when you want to go back to the main menu
-
 private slots:
+    /* Rôle : lance une partie */
     void on_StartBtn_clicked();
 
+    /* Rôle : passe en difficulté normale */
     void on_NormalBtn_clicked();
 
+    /* Rôle : passe en difficulté facile */
     void on_EasyBtn_clicked();
 
+    /* Rôle : passe en difficulté difficile */
     void on_HardBtn_clicked();
 
 private:
     Ui::MenuWindow *ui;
 
-
+    // Polices utilisés par les emojis pour la difficulté
     QFont defaultFont;
     QFont bigFont;
 };
