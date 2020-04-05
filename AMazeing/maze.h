@@ -26,6 +26,7 @@ using namespace std;
 using Point=pair<int,int>;
 
 
+// La classe Parent des objets que l'on peut retrouver dans le labyrinthe
 class Collectible{
 protected:
     float RAYON = 0.4, ROTATION_SPEED = 20;
@@ -40,7 +41,10 @@ public:
     ~Collectible();
     virtual void display(float);
     void setPosition(float x, float y){posX = x; posY = y;}
-    virtual void collected(){}
+    virtual void collected(){hasBeenCollected = true;}
+    bool HasBeenCollected(){return hasBeenCollected;}
+    void destroyIt(){hasBeenCollected = true;}
+    virtual void thisObjectHasBeenCollected(Collectible*){}
     float getX(){return posX;}
     float getY(){return posY;}
 };
@@ -96,15 +100,29 @@ private:
     void drawHorizontalWall(QPoint, QPoint);
 };
 
+// La clé qui permet d'ouvrir une porte dans le labyrinthe
 class Key : public Collectible{
-    bool seeThroughWall = true;
+    bool seeThroughWall = false;
     Maze * maze;
 public:
     Key(Maze*);
     void collected() override;
     void display(float) override;
+    void seeThrough(){seeThroughWall=true;}
+    void thisObjectHasBeenCollected(Collectible *) override{}
 };
 
+// Les lunettes qui permettent de voir la clé à travers les murs
+class Glasses : public Collectible{
+    Key* key;
+public:
+    Glasses(Key*);
+    void collected() override;
+    void display(float) override;
+    void thisObjectHasBeenCollected(Collectible*) override;
+};
+
+//Fonction permettant de transformer un int sous format horaire sur une alarme par exemple 8 => "08" et 12 => "12"
 QString intToStringHourFormat(long int);
 
 #endif // MAZE_H
