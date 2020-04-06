@@ -19,6 +19,9 @@ class MyGLWidget : public QGLWidget
     Q_OBJECT
 
     Maze maze;
+    bool isGameFinished = false;
+    QString score;
+
 
 public:
     MyGLWidget(QWidget *parent = 0);
@@ -33,6 +36,9 @@ protected:
 
 private:
     QTimer m_AnimationTimer;
+
+public slots:
+    void GameIsFinished(QString);
 };
 
 #endif

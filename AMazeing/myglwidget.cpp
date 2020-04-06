@@ -33,6 +33,8 @@ MyGLWidget::MyGLWidget(QWidget *parent)
     m_AnimationTimer.setInterval(10);
     m_AnimationTimer.start();
     setAutoFillBackground(false);
+
+    connect(&maze, SIGNAL(endOfGame(QString)), this, SLOT(GameIsFinished(QString)));
 }
 
 MyGLWidget::~MyGLWidget()
@@ -56,8 +58,6 @@ void MyGLWidget::paintEvent(QPaintEvent *event)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     // Reinitialisation des tampons
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0, 0, 0, 0);
@@ -66,6 +66,12 @@ void MyGLWidget::paintEvent(QPaintEvent *event)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     maze.display();
+
+    if(isGameFinished){
+        QFont font;
+        font.setPointSize(font.pointSize()*3);
+        renderText(rect().width()/2, rect().height()/2, "Félicitations !!!", font);
+    }
 
     glShadeModel(GL_FLAT);
     glDisable(GL_DEPTH_TEST);
@@ -129,6 +135,15 @@ void MyGLWidget::keyPressEvent(QKeyEvent * event)
             break;
         }
 
+    case Qt::Key_Enter:
+        {
+            if(isGameFinished){
+                maze.init();
+                isGameFinished = false;
+            }
+            break;
+        }
+
         // Cas par defaut
         default:
         {
@@ -167,4 +182,9 @@ void MyGLWidget::keyReleaseEvent(QKeyEvent * event)
         }
     }
     event->accept();
+}
+
+void MyGLWidget::GameIsFinished(QString time){
+    isGameFinished = true;
+    score = time;
 }

@@ -17,12 +17,18 @@ Maze::Maze(int width, int height)
 }
 
 void Maze::init(){
+    gameIsFinished = false;
     generate(); // Génere le labyrinthe
+    for(unsigned int i = 0; i < collectibles.size(); i++){
+        delete collectibles[i];
+    }
+    collectibles.clear();
     collectibles.emplace_back(new Key(this)); // Crée une clé que l'on positionne ensuite aléatoirement
     collectibles.back()->setPosition((int)(sizeByRoom * rand())%width_ + 1, (int)(sizeByRoom * rand())%height_ + 1);
     collectibles.emplace_back(new Glasses(dynamic_cast<Key*>(collectibles[0]))); // Crée des lunettes que l'on positionne ensuite aléatoirement
     collectibles.back()->setPosition((int)(sizeByRoom * rand())%width_ + 1, (int)(sizeByRoom * rand())%height_ + 1);
     player.init(); // On repositionne le joueur dans le labyrinthe
+    player.setPosition(1, 1);
 }
 
 void Maze::reinit()
@@ -77,11 +83,19 @@ void Maze::display(){
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    player.setCamera();
+    if(!gameIsFinished){
+        player.setCamera();
+    }else{
+        gluLookAt(5, 10, 5, 0, 0, 0, 0, 1, 0);
+        glRotated(360.f * timer.elapsed() / 10000, 0, 1, 0);
+        float direction[4] = {5, 10, 2, 0};
+        glLightfv(GL_LIGHT0, GL_POSITION, direction);
+        glTranslated(-width_, 0, -height_);
+    }
 
     float gray[4] = {0.8, 0.8, 0.8, 1};
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, gray);
-    // Dessine le sole et la plafond
+    // Dessine le sol et la plafond
     glBegin(GL_QUADS);
         glNormal3f(0, 1, 0);
         glVertex3f(0, 0, 0); // Sol
@@ -89,11 +103,13 @@ void Maze::display(){
         glVertex3f(width_ * sizeByRoom, 0, height_ * sizeByRoom);
         glVertex3f(width_ * sizeByRoom, 0, 0);
 
-        glNormal3f(0, -1, 0);
-        glVertex3f(0, wallHeight, 0); // Plafond
-        glVertex3f(0, wallHeight, height_ * sizeByRoom);
-        glVertex3f(width_ * sizeByRoom, wallHeight, height_ * sizeByRoom);
-        glVertex3f(width_ * sizeByRoom, wallHeight, 0);
+        if(!gameIsFinished){
+            glNormal3f(0, -1, 0);
+            glVertex3f(0, wallHeight, 0); // Plafond
+            glVertex3f(0, wallHeight, height_ * sizeByRoom);
+            glVertex3f(width_ * sizeByRoom, wallHeight, height_ * sizeByRoom);
+            glVertex3f(width_ * sizeByRoom, wallHeight, 0);
+        }
     glEnd();
 
     float green[4] = {100.f/255, 200.f/255, 150.f/255, 1};
@@ -150,6 +166,12 @@ void Maze::drawVerticalWall(QPoint a, QPoint b){
         glVertex3f(a.rx() + wallDepth/2, 0, a.ry() + wallDepth/2);
         glVertex3f(a.rx() + wallDepth/2, 0, a.ry() - wallDepth/2);
         glVertex3f(a.rx() + wallDepth/2, wallHeight, a.ry() - wallDepth/2);
+
+        glNormal3f(0, 1, 0);
+        glVertex3f(a.rx() + wallDepth/2, wallHeight, a.ry() - wallDepth/2);
+        glVertex3f(b.rx() + wallDepth/2, wallHeight, b.ry() - wallDepth/2);
+        glVertex3f(b.rx() + wallDepth/2, wallHeight, b.ry() + wallDepth/2);
+        glVertex3f(a.rx() + wallDepth/2, wallHeight, a.ry() + wallDepth/2);
     glEnd();
 }
 
@@ -180,6 +202,12 @@ void Maze::drawHorizontalWall(QPoint a, QPoint b){
         glVertex3f(a.rx() + wallDepth/2, 0, a.ry() - wallDepth/2);
         glVertex3f(a.rx() - wallDepth/2, 0, a.ry() - wallDepth/2);
         glVertex3f(a.rx() - wallDepth/2, wallHeight, a.ry() - wallDepth/2);
+
+        glNormal3f(0, 1, 0);
+        glVertex3f(a.rx() - wallDepth/2, wallHeight, a.ry() - wallDepth/2);
+        glVertex3f(b.rx() - wallDepth/2, wallHeight, b.ry() + wallDepth/2);
+        glVertex3f(b.rx() + wallDepth/2, wallHeight, b.ry() + wallDepth/2);
+        glVertex3f(a.rx() + wallDepth/2, wallHeight, a.ry() - wallDepth/2);
     glEnd();
 }
 
@@ -222,43 +250,45 @@ void Maze::generate()
 }
 
 void Maze::drawMap(QPainter *painter){
-    if(!isPlayerMoving){ // Si le joueur ne bouge pas, alors on affiche la minimap
-        painter->fillRect(offset.x(), offset.y(), sizeOfCaseOnMap * width_, sizeOfCaseOnMap * height_, QBrush(QColor(0, 0, 0, 120)));
-        painter->setBrush(Qt::white);
-        painter->setPen(QPen(Qt::white, 2));
-        for (unsigned int i=0;i<height_;i++) {
-            if(grid_[i][0].isFrontier(Cell::W))
-                painter->drawLine(sizeOfCaseOnMap*QPoint(0, i) + offset, sizeOfCaseOnMap*QPoint(0, i + 1) + offset);
-            for (unsigned int j=0;j<width_;j++) {
-                if (grid_[i][j].isFrontier(Cell::E)){
-                    painter->drawLine(sizeOfCaseOnMap*QPoint(j + 1, i) + offset, sizeOfCaseOnMap*QPoint(j + 1, i + 1) + offset);
+    if(!gameIsFinished){
+        if(!isPlayerMoving){ // Si le joueur ne bouge pas, alors on affiche la minimap
+            painter->fillRect(offset.x(), offset.y(), sizeOfCaseOnMap * width_, sizeOfCaseOnMap * height_, QBrush(QColor(0, 0, 0, 120)));
+            painter->setBrush(Qt::white);
+            painter->setPen(QPen(Qt::white, 2));
+            for (unsigned int i=0;i<height_;i++) {
+                if(grid_[i][0].isFrontier(Cell::W))
+                    painter->drawLine(sizeOfCaseOnMap*QPoint(0, i) + offset, sizeOfCaseOnMap*QPoint(0, i + 1) + offset);
+                for (unsigned int j=0;j<width_;j++) {
+                    if (grid_[i][j].isFrontier(Cell::E)){
+                        painter->drawLine(sizeOfCaseOnMap*QPoint(j + 1, i) + offset, sizeOfCaseOnMap*QPoint(j + 1, i + 1) + offset);
+                    }
+                    if (grid_[i][j].isFrontier(Cell::S))
+                        painter->drawLine(sizeOfCaseOnMap*QPoint(j, i + 1) + offset, sizeOfCaseOnMap*QPoint(j + 1, i + 1) + offset);
                 }
-                if (grid_[i][j].isFrontier(Cell::S))
-                    painter->drawLine(sizeOfCaseOnMap*QPoint(j, i + 1) + offset, sizeOfCaseOnMap*QPoint(j + 1, i + 1) + offset);
             }
-        }
-        for (unsigned int j=0;j<width_;j++) {
-            if (grid_[0][j].isFrontier(Cell::N))
-                painter->drawLine(sizeOfCaseOnMap*QPoint(j, 0) + offset, sizeOfCaseOnMap*QPoint(j + 1, 0) + offset);
+            for (unsigned int j=0;j<width_;j++) {
+                if (grid_[0][j].isFrontier(Cell::N))
+                    painter->drawLine(sizeOfCaseOnMap*QPoint(j, 0) + offset, sizeOfCaseOnMap*QPoint(j + 1, 0) + offset);
+            }
+
+            player.drawPlayer(painter, sizeOfCaseOnMap/sizeByRoom, offset);
         }
 
-        player.drawPlayer(painter, sizeOfCaseOnMap/sizeByRoom, offset);
+        // Ici on affiche la chronomètre à droite de la minimap (ou de l'endroit ou elle serait affiché si elle ne l'est pas)
+        QFont font = painter->font() ;
+        font.setPointSize(font.pointSize() * 2);
+        painter->setFont(font);
+
+        painter->setPen(QPen(Qt::white, 20));
+        long int time = timer.elapsed();
+        QString hour;
+        hour.append(intToStringHourFormat(time/60000) + " : ");
+        time -= (time/60000)*60000;
+        hour.append(intToStringHourFormat(time/1000) + " : ");
+        time -= (time/1000)*1000;
+        hour.append(intToStringHourFormat(time));
+        painter->drawText(offset.x() + sizeOfCaseOnMap * width_ + 20, 4 * offset.y(), QString(hour));
     }
-
-    // Ici on affiche la chronomètre à droite de la minimap (ou de l'endroit ou elle serait affiché si elle ne l'est pas)
-    QFont font = painter->font() ;
-    font.setPointSize(font.pointSize() * 2);
-    painter->setFont(font);
-
-    painter->setPen(QPen(Qt::white, 20));
-    long int time = timer.elapsed();
-    QString hour;
-    hour.append(intToStringHourFormat(time/60000) + " : ");
-    time -= (time/60000)*60000;
-    hour.append(intToStringHourFormat(time/1000) + " : ");
-    time -= (time/1000)*1000;
-    hour.append(intToStringHourFormat(time));
-    painter->drawText(offset.x() + sizeOfCaseOnMap * width_ + 20, 4 * offset.y(), QString(hour));
 }
 
 bool Maze::tryFrontier(int x, int y, Cell::Direction d){
@@ -324,8 +354,17 @@ void Maze::walk(float w){
     }
 
     player.setPosition(newX, newY);
-    if(newX < 0 || newX > width_ * sizeByRoom || newY < 0 || newY > height_ * sizeByRoom) // Si on est sorti du labyrinthe
-        timer.restart();
+    if(newX < 0 || newX > width_ * sizeByRoom || newY < 0 || newY > height_ * sizeByRoom){ // Si on est sorti du labyrinthe
+        gameIsFinished = true;
+        long int time = timer.elapsed();
+        QString hour;
+        hour.append(intToStringHourFormat(time/60000) + " : ");
+        time -= (time/60000)*60000;
+        hour.append(intToStringHourFormat(time/1000) + " : ");
+        time -= (time/1000)*1000;
+        hour.append(intToStringHourFormat(time));
+        emit endOfGame(hour);
+    }
 }
 
 void Maze::removeWall(){
@@ -364,11 +403,6 @@ Collectible::Collectible(QString imageName){
     }
 
     totalTime = (rand()%1000)/500.f;
-}
-
-
-Collectible::~Collectible(){
-    gluDeleteQuadric(quadrique);
 }
 
 void Collectible::display(float elapsedTime){
