@@ -18,9 +18,9 @@ MenuWindow::~MenuWindow() {
 }
 
 void MenuWindow::on_StartBtn_clicked() {
-    MainWindow* mw = new MainWindow(this);
+    MainWindow* mw = new MainWindow();
     mw->show();
-    hide();
+    close();
 }
 
 
