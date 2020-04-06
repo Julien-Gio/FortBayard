@@ -15,8 +15,8 @@
 
 
 // Declarations des constantes
-const unsigned int WIN_WIDTH  = 1600;
-const unsigned int WIN_HEIGHT = 900;
+const unsigned int WIN_WIDTH  = 1400;
+const unsigned int WIN_HEIGHT = 800;
 
 
 MyGLWidget::MyGLWidget(QWidget *parent)

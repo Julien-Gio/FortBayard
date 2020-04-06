@@ -10,7 +10,6 @@
  * S'occupe d'afficher le labyrinthe 3D avec un widget openGL.
  **/
 
-
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -22,6 +21,8 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+    void setImageLbl(QImage& img);
 
 private:
     Ui::MainWindow *ui;

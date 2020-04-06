@@ -1,4 +1,5 @@
 #include "facehandler.h"
+#include "mainwindow.h"
 
 FaceHandler::FaceHandler(Maze* maze_) :
     cap(0) {
@@ -28,7 +29,7 @@ FaceHandler::FaceHandler(Maze* maze_) :
     maze = maze_;
 
     // Init output window
-    namedWindow("WebCam", 1);
+    //namedWindow("WebCam", 1);
 
     // Create the video tread
     th = new std::thread(&FaceHandler::update, this);
@@ -97,9 +98,15 @@ void FaceHandler::update() {
         }
 
         // Display frame
-        imshow("WebCam", frame);
+        //imshow("WebCam", frame);
+        QImage img = QImage((const unsigned char*)(frame.data), frame.cols, frame.rows, QImage::Format_BGR888);
 
-        this_thread::sleep_for(chrono::milliseconds(10));
+        if (mw != NULL) {
+            mw->setImageLbl(img);
+        }
+
+
+        this_thread::sleep_for(chrono::milliseconds(40));
     }
 }
 

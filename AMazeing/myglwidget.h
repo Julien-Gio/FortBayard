@@ -31,6 +31,8 @@ public:
     MyGLWidget(QWidget *parent = 0);
     ~MyGLWidget();
 
+    void setMainWindow(MainWindow* p) { fh.setMainWindowP(p); }
+
 protected:
     void initializeGL();
     void paintEvent(QPaintEvent *event);

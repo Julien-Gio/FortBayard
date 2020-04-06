@@ -17,10 +17,12 @@
 
 using namespace cv;
 
+class MainWindow;  // Forward declaration
 
 class FaceHandler {
     std::thread* th;
     Maze* maze;  // Passer dans le constructeur. FaceHandler ne créer/delete pas maze. Utile pour bouger controler le joueur
+    MainWindow* mw = NULL;  // Reference vers le QLabel de la fenetre qui doit recevoir un feed de la camera
 
     // Quelques constantes pour rendre le code plus lisible //
     // Indices des directions dans le tableau SEUILS
@@ -81,6 +83,8 @@ public:
     void toogle_debug_graphics() {
         debugGraphics = !debugGraphics;
     }
+
+    void setMainWindowP(MainWindow* p) { mw = p; }
 
 private:
     void updateC(Rect& face);  // Rôle : méthode de mise à jour de l'etat 'C'.
