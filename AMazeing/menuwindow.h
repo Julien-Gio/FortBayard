@@ -3,6 +3,16 @@
 
 #include <QMainWindow>
 
+/*
+ * Classe pour la fenetre du menu principale.
+ * Le Menu est la première fenetre qui s'ouvre en lancant le programme.
+ * Il permet au joueur de choisir une difficulté:
+ *  facile      : 6 * 5
+ *  normal      : 10 * 6
+ *  difficile   : 14 * 10
+ *
+ **/
+
 namespace Ui {
 class MenuWindow;
 }

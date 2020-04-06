@@ -85,7 +85,7 @@ public:
     void reinit(); // Role: réinitialiser le labyrinthe
     void display(); // Role: Afficher en 3D le labyrinthe
     void generate(); // Role: génerer un labyrinthe
-    void drawMap(QPainter*); // Role: afficher en 2D le labyrinthe en haut à gauche de l'écran. Entrée le QPainter pour dessiner
+    void drawMap(QPainter*); // Role: afficher en 2D le labyrinthe en haut à gauche de l'écran. Entrée: le QPainter pour dessiner
     float getSizeOfRoom(){return sizeByRoom;}
 
     void init(); // Role: Initialise les objets, et le personnage à des positions aléatoire avant de générer le labyrinthe
