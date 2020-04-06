@@ -29,12 +29,16 @@ public:
     Player();
     void init();
     void setCamera(); // Role: Positionne la caméra à la position du joueur.
-    void rotate(float); // Role: Rotate le joueur. Entrée: l'amplitude de la rotation
+
+    void rotate(float); // Role: Rotate le joueur. Entrée: l'amplitude de la rotation.
     float getRotation();
+
     void drawPlayer(QPainter *, float sizeOfCase, QPoint offset); // Role: Dessine le joueur en 2D sur la minimap. Entrée: Le QPainter pour dessiner, la taille d'une case (ce qui va influer sur le positionnement du dessin et l'offset de la position de la minimap
+
     float getPosX(){return posX;}
     float getPosY(){return posY;}
     void setPosition(float x, float y);
+
     void addFootPrint(); // Role: Ajoute une trace de pas à la position actuel du joueur.
     void displayFootPrint(); // Role: Affiche toutes les traces de pas dans l'environnement 3D.
 };

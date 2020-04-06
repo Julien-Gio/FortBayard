@@ -5,6 +5,12 @@
 #include <QApplication>
 #include <QDesktopWidget>
 
+/*
+ * Classe de la fenetre de jeu.
+ * S'occupe d'afficher le labyrinthe 3D avec un widget openGL.
+ **/
+
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE

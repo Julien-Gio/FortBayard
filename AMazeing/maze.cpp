@@ -14,6 +14,7 @@ using namespace std;
 
 Maze::Maze()
 {
+    // Réglage de la difficulté
     if (MenuWindow::diff == 'E') {
         width_ = 6;
         height_ = 4;

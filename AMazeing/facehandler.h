@@ -20,7 +20,7 @@ using namespace cv;
 
 class FaceHandler {
     std::thread* th;
-    Maze* maze;  // Passer dans le constructeur. FaceHandler ne créer/delete pas maze.
+    Maze* maze;  // Passer dans le constructeur. FaceHandler ne créer/delete pas maze. Utile pour bouger controler le joueur
 
     // Quelques constantes pour rendre le code plus lisible //
     // Indices des directions dans le tableau SEUILS

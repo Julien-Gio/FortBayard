@@ -15,6 +15,11 @@ class QtLogo;
 class QPaintEvent;
 class QWidget;
 
+/*
+ * Classe qui gère a la fois le labyrinthe, son l'affichage 3D et fait le lien entre
+ * la classe de detection de mouvement du visage et le joueur.
+ **/
+
 class MyGLWidget : public QGLWidget
 {
     Q_OBJECT
