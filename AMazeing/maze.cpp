@@ -110,17 +110,17 @@ void Maze::display(){
     // Dessine le sol et la plafond
     glBegin(GL_QUADS);
         glNormal3f(0, 1, 0);
-        glVertex3f(0, 0, 0); // Sol
-        glVertex3f(0, 0, height_ * sizeByRoom);
-        glVertex3f(width_ * sizeByRoom, 0, height_ * sizeByRoom);
-        glVertex3f(width_ * sizeByRoom, 0, 0);
+        glVertex3f(-wallDepth/2, 0, -wallDepth/2); // Sol
+        glVertex3f(-wallDepth/2, 0, height_ * sizeByRoom + wallDepth/2);
+        glVertex3f(width_ * sizeByRoom + wallDepth/2, 0, height_ * sizeByRoom + wallDepth/2);
+        glVertex3f(width_ * sizeByRoom, 0, -wallDepth/2);
 
         if(!gameIsFinished){
             glNormal3f(0, -1, 0);
-            glVertex3f(0, wallHeight, 0); // Plafond
-            glVertex3f(0, wallHeight, height_ * sizeByRoom);
-            glVertex3f(width_ * sizeByRoom, wallHeight, height_ * sizeByRoom);
-            glVertex3f(width_ * sizeByRoom, wallHeight, 0);
+            glVertex3f(-wallDepth/2, wallHeight, -wallDepth/2); // Plafond
+            glVertex3f(-wallDepth/2, wallHeight, height_ * sizeByRoom + wallDepth/2);
+            glVertex3f(width_ * sizeByRoom + wallDepth/2, wallHeight, height_ * sizeByRoom + wallDepth/2);
+            glVertex3f(width_ * sizeByRoom + wallDepth/2, wallHeight, -wallDepth/2);
         }
     glEnd();
 
