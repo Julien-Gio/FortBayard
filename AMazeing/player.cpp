@@ -15,12 +15,13 @@ void Player::init(){
 
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+
+    footPrints.clear();
 }
 
 void Player::setCamera(){
     gluLookAt(posX, HEIGHT, posY, posX + std::cos(yRotation), HEIGHT, posY + std::sin(yRotation), 0, 1, 0);
     float position[4] = {posX, HEIGHT, posY, 1};
-    float direction[3] = {0, 0, -1};
     glLightfv(GL_LIGHT0, GL_POSITION, position);
 }
 

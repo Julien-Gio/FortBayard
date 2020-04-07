@@ -38,7 +38,7 @@ protected:
 
 public:
     Collectible(QString);
-    ~Collectible();
+    virtual ~Collectible(){}
     virtual void display(float); // Role: Affiche en 3D l'objet dans l'espace. Entrée: le temps écoulé depuis la dernière frame
     void setPosition(float x, float y){posX = x; posY = y;}
     virtual void collected(){hasBeenCollected = true;} // Role: Effectuer une action sur un autre objet et mettre à true le booleen hasBeenCollected
@@ -49,8 +49,10 @@ public:
     float getY(){return posY;}
 };
 
-class Maze
+class Maze : public QObject
 {
+    Q_OBJECT
+
     std::vector<Collectible*> collectibles;
     Player player;
 
@@ -64,6 +66,7 @@ class Maze
 
     std::vector<Wall> walls;
     bool isPlayerMoving = false;
+    bool gameIsFinished = false;
 
     const float wallHeight = 3;
     const float wallDepth = 0.2;
@@ -95,6 +98,11 @@ public:
     void idle(){isPlayerMoving = false;} // Role: Signaler que le personnage ne doit pas bouger (ce qui permet de rafficher la minimap).
     void removeWall(); // Role: Retire un mur sur le contour du labyrinthe de façon aléatoire.
 
+
+signals:
+    void endOfGame(QString);
+
+
 private:
     void drawVerticalWall(QPoint, QPoint); // Role: Dessine un mur vertical en 3D d'un point A à un point B. Entrée: Le point A et le point B
     void drawHorizontalWall(QPoint, QPoint); // Role: Dessine un mur horizontal en 3D d'un point A à un point B. Entrée: Le point A et le point B
@@ -106,6 +114,7 @@ class Key : public Collectible{
     Maze * maze;
 public:
     Key(Maze*);
+    ~Key(){gluDeleteQuadric(quadrique);}
     void collected() override; // Role: La fonction appelé quand l'objet est collecté.
     void display(float) override; // Role: La fonction pour afficher en 3D l'objet dans la labyrinthe. Entrée: le temps écoulé depuis la dernière frame
     void seeThrough(){seeThroughWall=true;} // Role: Une fonction permettant d'activer le fait que l'on puisse voir l'objet à travers les murs
@@ -117,6 +126,7 @@ class Glasses : public Collectible{
     Key* key;
 public:
     Glasses(Key*);
+    ~Glasses(){}
     void collected() override; // Role: La fonction appelé quand l'objet est collecté.
     void display(float) override; // Role: La fonction pour afficher en 3D l'objet dans la labyrinthe. Entrée: le temps écoulé depuis la dernière frame
     void thisObjectHasBeenCollected(Collectible*) override; // Role: La fonction permettant de signaler à cette objet, quel objet a été ramassé. Pour le cas des lunettes, si la clé a déjà été ramassé, alors on supprime les lunettes

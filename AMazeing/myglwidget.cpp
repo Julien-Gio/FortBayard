@@ -34,6 +34,8 @@ MyGLWidget::MyGLWidget(QWidget *parent)
     m_AnimationTimer.setInterval(10);
     m_AnimationTimer.start();
     setAutoFillBackground(false);
+
+    connect(&maze, SIGNAL(endOfGame(QString)), this, SLOT(GameIsFinished(QString)));
 }
 
 MyGLWidget::~MyGLWidget()
@@ -57,8 +59,6 @@ void MyGLWidget::paintEvent(QPaintEvent *event)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     // Reinitialisation des tampons
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0, 0, 0, 0);
@@ -67,6 +67,13 @@ void MyGLWidget::paintEvent(QPaintEvent *event)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     maze.display();
+
+    if(isGameFinished){
+        drawTextWithStroke(rect().width()/2 - 40, rect().height()/2 - 20, "Félicitations !", 30);
+        drawTextWithStroke(rect().width()/2 - 260, rect().height()/2 + 20, "Tu as fais un score de " + score, 30);
+        drawTextWithStroke(rect().width()/2 - 140, rect().height()/2 + 80, "Appuyez sur Entrée pour recommencer", 20);
+        drawTextWithStroke(rect().width()/2 - 120, rect().height()/2 + 120, "Appuyez sur Echap pour quitter", 20);
+    }
 
     glShadeModel(GL_FLAT);
     glDisable(GL_DEPTH_TEST);
@@ -122,6 +129,15 @@ void MyGLWidget::keyPressEvent(QKeyEvent * event)
             maze.walk(-0.1);
             break;
 
+    case Qt::Key_Enter:
+        {
+            if(isGameFinished){
+                maze.init();
+                isGameFinished = false;
+            }
+            break;
+        }
+
         // Cas par defaut
         default:
             // Ignorer l'evenement
@@ -158,4 +174,21 @@ void MyGLWidget::keyReleaseEvent(QKeyEvent * event)
         }
     }
     event->accept();
+}
+
+void MyGLWidget::drawTextWithStroke(int x, int y, QString str, int fontSize){
+    QFont font;
+    font.setPointSize(fontSize);
+    glColor3ub(0, 0, 0);
+    renderText(x-2, y-2, str, font);
+    renderText(x+2, y-2, str, font);
+    renderText(x+2, y+2, str, font);
+    renderText(x-2, y+2, str, font);
+    glColor3ub(255, 255, 255);
+    renderText(x, y, str, font);
+}
+
+void MyGLWidget::GameIsFinished(QString time){
+    isGameFinished = true;
+    score = time;
 }

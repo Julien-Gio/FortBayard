@@ -26,6 +26,9 @@ class MyGLWidget : public QGLWidget
 
     Maze maze;
     FaceHandler fh;
+    bool isGameFinished = false;
+    QString score;
+
 
 public:
     MyGLWidget(QWidget *parent = 0);
@@ -39,9 +42,13 @@ protected:
     void resizeGL(int width, int height);
     void keyPressEvent(QKeyEvent*);
     void keyReleaseEvent(QKeyEvent*);
+    void drawTextWithStroke(int x, int y, QString, int fontSize);
 
 private:
     QTimer m_AnimationTimer;
+
+public slots:
+    void GameIsFinished(QString);
 };
 
 #endif
