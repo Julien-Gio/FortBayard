@@ -68,9 +68,10 @@ void MyGLWidget::paintEvent(QPaintEvent *event)
     maze.display();
 
     if(isGameFinished){
-        QFont font;
-        font.setPointSize(font.pointSize()*3);
-        renderText(rect().width()/2, rect().height()/2, "Félicitations !!!", font);
+        drawTextWithStroke(rect().width()/2 - 40, rect().height()/2 - 20, "Félicitations !", 30);
+        drawTextWithStroke(rect().width()/2 - 260, rect().height()/2 + 20, "Tu as fais un score de " + score, 30);
+        drawTextWithStroke(rect().width()/2 - 140, rect().height()/2 + 80, "Appuyez sur Entrée pour recommencer", 20);
+        drawTextWithStroke(rect().width()/2 - 120, rect().height()/2 + 120, "Appuyez sur Echap pour quitter", 20);
     }
 
     glShadeModel(GL_FLAT);
@@ -182,6 +183,18 @@ void MyGLWidget::keyReleaseEvent(QKeyEvent * event)
         }
     }
     event->accept();
+}
+
+void MyGLWidget::drawTextWithStroke(int x, int y, QString str, int fontSize){
+    QFont font;
+    font.setPointSize(fontSize);
+    glColor3ub(0, 0, 0);
+    renderText(x-2, y-2, str, font);
+    renderText(x+2, y-2, str, font);
+    renderText(x+2, y+2, str, font);
+    renderText(x-2, y+2, str, font);
+    glColor3ub(255, 255, 255);
+    renderText(x, y, str, font);
 }
 
 void MyGLWidget::GameIsFinished(QString time){

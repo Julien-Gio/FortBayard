@@ -33,6 +33,7 @@ protected:
     void resizeGL(int width, int height);
     void keyPressEvent(QKeyEvent*);
     void keyReleaseEvent(QKeyEvent*);
+    void drawTextWithStroke(int x, int y, QString, int fontSize);
 
 private:
     QTimer m_AnimationTimer;
