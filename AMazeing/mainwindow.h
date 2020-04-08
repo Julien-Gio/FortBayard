@@ -24,6 +24,9 @@ public:
 
     void setImageLbl(QImage& img);
 
+public slots:
+    void goToMainMenu();
+
 private:
     Ui::MainWindow *ui;
 };

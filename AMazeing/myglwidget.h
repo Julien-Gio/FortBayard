@@ -47,6 +47,9 @@ protected:
 private:
     QTimer m_AnimationTimer;
 
+signals:
+    void goToMainMenu();
+
 public slots:
     void GameIsFinished(QString);
 };

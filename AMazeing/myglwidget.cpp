@@ -129,11 +129,10 @@ void MyGLWidget::keyPressEvent(QKeyEvent * event)
             maze.walk(-0.1);
             break;
 
-    case Qt::Key_Enter:
+    case Qt::Key_Enter: case Qt::Key_Return:
         {
-            if(isGameFinished){
-                maze.init();
-                isGameFinished = false;
+            if(isGameFinished) {
+                emit goToMainMenu();
             }
             break;
         }

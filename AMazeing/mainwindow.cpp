@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "menuwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -8,6 +9,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     ui->openGLWidget->grabKeyboard();
     ui->openGLWidget->setMainWindow(this);
+
+    connect(ui->openGLWidget, SIGNAL(goToMainMenu()), this, SLOT(goToMainMenu()));
 }
 
 
@@ -22,4 +25,12 @@ void MainWindow::setImageLbl(QImage& img) {
     ui->camera->setPixmap(QPixmap::fromImage(img));
     // Resize the label to fit the image
     ui->camera->resize(ui->camera->pixmap()->size());
+}
+
+
+// Slots
+void MainWindow::goToMainMenu() {
+    MenuWindow* mw = new MenuWindow();
+    mw->show();
+    close();
 }
