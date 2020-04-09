@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 
+#include "mainwindow.h"
 /*
  * Classe pour la fenetre du menu principale.
  * Le Menu est la première fenetre qui s'ouvre en lancant le programme.
@@ -20,6 +21,7 @@ class MenuWindow;
 class MenuWindow : public QMainWindow
 {
     Q_OBJECT
+    MainWindow* mw = NULL;
 
 public:
     static char diff;  // 'E' for easy ; 'N' for normal ; 'H' for hard
@@ -27,6 +29,10 @@ public:
 
     explicit MenuWindow(QWidget *parent = nullptr);
     ~MenuWindow();
+
+public slots:
+    void openMenu();  // Réouvre la fenêtre de menu
+    void closeMenu();  // Ferme la fenêtre de menu
 
 private slots:
     /* Rôle : lance une partie */

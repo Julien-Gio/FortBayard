@@ -15,11 +15,29 @@ MenuWindow::MenuWindow(QWidget *parent) :
 
 MenuWindow::~MenuWindow() {
     delete ui;
+    if (mw != NULL) {
+        delete mw;
+    }
 }
 
 void MenuWindow::on_StartBtn_clicked() {
-    MainWindow* mw = new MainWindow(camera);
+    mw = new MainWindow(camera);
     mw->show();
+    connect(mw, SIGNAL(openMenu()), this, SLOT(openMenu()));
+    connect(mw, SIGNAL(closeMenu()), this, SLOT(closeMenu()));
+    hide();
+}
+
+
+void MenuWindow::openMenu() {
+    mw->close();
+    delete mw;
+    mw = NULL;
+    show();
+}
+
+
+void MenuWindow::closeMenu() {
     close();
 }
 

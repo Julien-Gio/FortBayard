@@ -22,10 +22,16 @@ public:
     MainWindow(bool playWithCamera, QWidget *parent = nullptr);
     ~MainWindow();
 
+    void closeEvent(QCloseEvent *event);
+
     void setImageLbl(QImage& img);
 
 public slots:
     void goToMainMenu();
+
+signals:
+    void openMenu();
+    void closeMenu();
 
 private:
     Ui::MainWindow *ui;

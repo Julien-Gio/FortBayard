@@ -118,9 +118,8 @@ void MyGLWidget::keyPressEvent(QKeyEvent * event)
     {
         // Sortie de l'application
         case Qt::Key_Escape:
-            if(isGameFinished) {
-                emit goToMainMenu();
-            }
+            emit goToMainMenu();
+
             break;
 
         case Qt::Key_Right:

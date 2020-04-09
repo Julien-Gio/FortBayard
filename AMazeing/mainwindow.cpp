@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "menuwindow.h"
+#include <QCloseEvent>
 
 MainWindow::MainWindow(bool playWithCamera, QWidget *parent)
     : QMainWindow(parent)
@@ -21,6 +22,12 @@ MainWindow::~MainWindow()
 }
 
 
+void MainWindow::closeEvent(QCloseEvent *event) {
+    emit closeMenu();
+    event->accept();
+}
+
+
 void MainWindow::setImageLbl(QImage& img) {
     // Display on label
     ui->camera->setPixmap(QPixmap::fromImage(img));
@@ -31,7 +38,7 @@ void MainWindow::setImageLbl(QImage& img) {
 
 // Slots
 void MainWindow::goToMainMenu() {
-    MenuWindow* mw = new MenuWindow();
-    mw->show();
-    close();
+//    MenuWindow* mw = new MenuWindow();
+//    mw->show();
+    emit openMenu();
 }
