@@ -79,10 +79,10 @@ void MyGLWidget::paintEvent(QPaintEvent *event)
     maze.display();
 
     if(isGameFinished){
-        drawTextWithStroke(rect().width()/2 - 40, rect().height()/2 - 20, "Félicitations !", 30);
-        drawTextWithStroke(rect().width()/2 - 260, rect().height()/2 + 20, "Tu as fais un score de " + score, 30);
-        drawTextWithStroke(rect().width()/2 - 140, rect().height()/2 + 80, "Appuyez sur Entrée pour recommencer", 20);
-        drawTextWithStroke(rect().width()/2 - 120, rect().height()/2 + 120, "Appuyez sur Echap pour quitter", 20);
+        drawTextWithStroke(rect().width()/2 - 140, rect().height()/2 - 20, "Félicitations !", 30);
+        drawTextWithStroke(rect().width()/2 - 360, rect().height()/2 + 20, "Tu as fais un score de " + score, 30);
+        drawTextWithStroke(rect().width()/2 - 240, rect().height()/2 + 80, "Appuyez sur Entrée pour recommencer", 20);
+        drawTextWithStroke(rect().width()/2 - 220, rect().height()/2 + 120, "Appuyez sur Echap pour quitter", 20);
     }
 
     glShadeModel(GL_FLAT);

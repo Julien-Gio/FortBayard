@@ -113,7 +113,7 @@ void Maze::display(){
         glVertex3f(-wallDepth/2, 0, -wallDepth/2); // Sol
         glVertex3f(-wallDepth/2, 0, height_ * sizeByRoom + wallDepth/2);
         glVertex3f(width_ * sizeByRoom + wallDepth/2, 0, height_ * sizeByRoom + wallDepth/2);
-        glVertex3f(width_ * sizeByRoom, 0, -wallDepth/2);
+        glVertex3f(width_ * sizeByRoom + wallDepth/2, 0, -wallDepth/2);
 
         if(!gameIsFinished){
             glNormal3f(0, -1, 0);
