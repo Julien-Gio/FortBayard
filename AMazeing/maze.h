@@ -106,6 +106,7 @@ signals:
 private:
     void drawVerticalWall(QPoint, QPoint); // Role: Dessine un mur vertical en 3D d'un point A à un point B. Entrée: Le point A et le point B
     void drawHorizontalWall(QPoint, QPoint); // Role: Dessine un mur horizontal en 3D d'un point A à un point B. Entrée: Le point A et le point B
+    QPoint findEmptyCase(); // Role: Trouver une case vide dans le labyrinthe pour placer un objet. Sortie: La position de la case
 };
 
 // La clé qui permet d'ouvrir une porte dans le labyrinthe

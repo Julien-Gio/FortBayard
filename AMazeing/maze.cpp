@@ -35,12 +35,32 @@ void Maze::init(){
         delete collectibles[i];
     }
     collectibles.clear();
+    QPoint pos = findEmptyCase();
     collectibles.emplace_back(new Key(this)); // Crée une clé que l'on positionne ensuite aléatoirement
-    collectibles.back()->setPosition((int)(sizeByRoom * rand())%width_ + 1, (int)(sizeByRoom * rand())%height_ + 1);
+    collectibles.back()->setPosition(pos.x(), pos.y());
+    pos = findEmptyCase();
     collectibles.emplace_back(new Glasses(dynamic_cast<Key*>(collectibles[0]))); // Crée des lunettes que l'on positionne ensuite aléatoirement
-    collectibles.back()->setPosition((int)(sizeByRoom * rand())%width_ + 1, (int)(sizeByRoom * rand())%height_ + 1);
+    collectibles.back()->setPosition(pos.x(), pos.y());
     player.init(); // On repositionne le joueur dans le labyrinthe
     player.setPosition(1, 1);
+}
+
+QPoint Maze::findEmptyCase(){
+    QPoint pos;
+    bool isCaseEmpty = true;
+    do{
+        isCaseEmpty = true;
+        pos.setX((int)(sizeByRoom * rand())%width_ + 1);
+        pos.setY((int)(sizeByRoom * rand())%height_ + 1);
+        if(pos.x() == 1 && pos.y() == 1)
+            isCaseEmpty = false; // On est sur le personnage
+        for(unsigned int i = 0; i < collectibles.size(); i++){
+            if(pos.x() == collectibles[i]->getX() && pos.y() == collectibles[i]->getY())
+                isCaseEmpty = false; // Un objet est déjà sur cette case
+        }
+
+    }while(!isCaseEmpty);
+    return pos;
 }
 
 void Maze::reinit()
