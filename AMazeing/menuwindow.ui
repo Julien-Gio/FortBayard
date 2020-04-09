@@ -25,7 +25,7 @@
       </property>
       <property name="font">
        <font>
-        <pointsize>72</pointsize>
+        <pointsize>76</pointsize>
         <weight>75</weight>
         <bold>true</bold>
         <underline>false</underline>
@@ -61,13 +61,13 @@
        <widget class="QLabel" name="label_3">
         <property name="minimumSize">
          <size>
-          <width>130</width>
+          <width>150</width>
           <height>0</height>
          </size>
         </property>
         <property name="font">
          <font>
-          <pointsize>15</pointsize>
+          <pointsize>18</pointsize>
          </font>
         </property>
         <property name="text">
@@ -109,7 +109,7 @@
         </property>
         <property name="font">
          <font>
-          <pointsize>28</pointsize>
+          <pointsize>32</pointsize>
          </font>
         </property>
         <property name="cursor">
@@ -181,13 +181,13 @@
        <widget class="QLabel" name="label_2">
         <property name="minimumSize">
          <size>
-          <width>130</width>
+          <width>145</width>
           <height>0</height>
          </size>
         </property>
         <property name="font">
          <font>
-          <pointsize>15</pointsize>
+          <pointsize>18</pointsize>
          </font>
         </property>
         <property name="text">
@@ -226,7 +226,7 @@
         </property>
         <property name="font">
          <font>
-          <pointsize>28</pointsize>
+          <pointsize>32</pointsize>
          </font>
         </property>
         <property name="text">
@@ -284,13 +284,13 @@
        <widget class="QPushButton" name="StartBtn">
         <property name="minimumSize">
          <size>
-          <width>250</width>
-          <height>96</height>
+          <width>270</width>
+          <height>105</height>
          </size>
         </property>
         <property name="font">
          <font>
-          <pointsize>32</pointsize>
+          <pointsize>36</pointsize>
           <weight>75</weight>
           <bold>true</bold>
          </font>
