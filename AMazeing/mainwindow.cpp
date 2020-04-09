@@ -2,11 +2,12 @@
 #include "ui_mainwindow.h"
 #include "menuwindow.h"
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(bool playWithCamera, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->openGLWidget->init(playWithCamera);
     ui->openGLWidget->grabKeyboard();
     ui->openGLWidget->setMainWindow(this);
 

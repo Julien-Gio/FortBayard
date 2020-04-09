@@ -18,7 +18,7 @@ MenuWindow::~MenuWindow() {
 }
 
 void MenuWindow::on_StartBtn_clicked() {
-    MainWindow* mw = new MainWindow();
+    MainWindow* mw = new MainWindow(camera);
     mw->show();
     close();
 }
@@ -45,4 +45,18 @@ void MenuWindow::on_HardBtn_clicked() {
     ui->EasyBtn->setFont(defaultFont);
     ui->NormalBtn->setFont(defaultFont);
     ui->HardBtn->setFont(bigFont);
+}
+
+void MenuWindow::on_KeyboardBtn_clicked()
+{
+    camera = false;
+    ui->KeyboardBtn->setFont(bigFont);
+    ui->CameraBtn->setFont(defaultFont);
+}
+
+void MenuWindow::on_CameraBtn_clicked()
+{
+   camera = true;
+    ui->KeyboardBtn->setFont(defaultFont);
+    ui->CameraBtn->setFont(bigFont);
 }

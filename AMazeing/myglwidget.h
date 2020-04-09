@@ -25,8 +25,9 @@ class MyGLWidget : public QGLWidget
     Q_OBJECT
 
     Maze maze;
-    FaceHandler fh;
+    FaceHandler* fh;
     bool isGameFinished = false;
+    bool playWithCamera;
     QString score;
 
 
@@ -34,7 +35,9 @@ public:
     MyGLWidget(QWidget *parent = 0);
     ~MyGLWidget();
 
-    void setMainWindow(MainWindow* p) { fh.setMainWindowP(p); }
+    void init(bool);
+
+    void setMainWindow(MainWindow* p) { if(playWithCamera) fh->setMainWindowP(p); }
 
 protected:
     void initializeGL();
@@ -43,6 +46,7 @@ protected:
     void keyPressEvent(QKeyEvent*);
     void keyReleaseEvent(QKeyEvent*);
     void drawTextWithStroke(int x, int y, QString, int fontSize);
+    void setControl(bool playWithCamera);
 
 private:
     QTimer m_AnimationTimer;

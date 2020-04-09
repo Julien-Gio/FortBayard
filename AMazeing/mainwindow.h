@@ -19,7 +19,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(bool playWithCamera, QWidget *parent = nullptr);
     ~MainWindow();
 
     void setImageLbl(QImage& img);

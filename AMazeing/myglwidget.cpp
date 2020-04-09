@@ -20,7 +20,7 @@ const unsigned int WIN_HEIGHT = 800;
 
 
 MyGLWidget::MyGLWidget(QWidget *parent)
-    : QGLWidget(QGLFormat(QGL::SampleBuffers), parent), maze(), fh(&maze)
+    : QGLWidget(QGLFormat(QGL::SampleBuffers), parent), maze()
 {
     // Reglage de la taille/position
     setFixedSize(WIN_WIDTH, WIN_HEIGHT);
@@ -38,8 +38,18 @@ MyGLWidget::MyGLWidget(QWidget *parent)
     connect(&maze, SIGNAL(endOfGame(QString)), this, SLOT(GameIsFinished(QString)));
 }
 
+void MyGLWidget::init(bool playWithCamer){
+    std::cout<<playWithCamer<<std::endl;
+    playWithCamera = playWithCamer;
+    if(playWithCamera)
+        fh = new FaceHandler(&maze);
+
+}
+
 MyGLWidget::~MyGLWidget()
 {
+    if(playWithCamera)
+        delete fh;
 }
 
 void MyGLWidget::initializeGL()
@@ -109,8 +119,9 @@ void MyGLWidget::keyPressEvent(QKeyEvent * event)
     {
         // Sortie de l'application
         case Qt::Key_Escape:
-            setAttribute(Qt::WA_DeleteOnClose, true);
-            close();
+            if(isGameFinished) {
+                emit goToMainMenu();
+            }
             break;
 
         case Qt::Key_Right:
@@ -129,13 +140,12 @@ void MyGLWidget::keyPressEvent(QKeyEvent * event)
             maze.walk(-0.1);
             break;
 
-    case Qt::Key_Enter: case Qt::Key_Return:
-        {
-            if(isGameFinished) {
-                emit goToMainMenu();
+        case Qt::Key_Enter: case Qt::Key_Return:
+            if(isGameFinished){
+                maze.init();
+                isGameFinished = false;
             }
             break;
-        }
 
         // Cas par defaut
         default:

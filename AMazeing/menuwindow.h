@@ -24,6 +24,7 @@ class MenuWindow : public QMainWindow
 public:
     static char diff;  // 'E' for easy ; 'N' for normal ; 'H' for hard
 
+
     explicit MenuWindow(QWidget *parent = nullptr);
     ~MenuWindow();
 
@@ -40,12 +41,18 @@ private slots:
     /* Rôle : passe en difficulté difficile */
     void on_HardBtn_clicked();
 
+    void on_KeyboardBtn_clicked();
+
+    void on_CameraBtn_clicked();
+
 private:
     Ui::MenuWindow *ui;
 
     // Polices utilisés par les emojis pour la difficulté
     QFont defaultFont;
     QFont bigFont;
+
+    bool camera;  // Play with the camera.
 };
 
 #endif // MENUWINDOW_H

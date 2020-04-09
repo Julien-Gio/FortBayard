@@ -33,7 +33,10 @@
     <item row="0" column="1">
      <widget class="QLabel" name="camera">
       <property name="text">
-       <string>TextLabel</string>
+       <string/>
+      </property>
+      <property name="margin">
+       <number>0</number>
       </property>
      </widget>
     </item>
