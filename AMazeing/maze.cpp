@@ -331,12 +331,18 @@ bool Maze::tryFrontier(int x, int y, Cell::Direction d){
     return false;
 }
 
-void Maze::rotate(float r){
+void Maze::rotate(float r) {
+    if (gameIsFinished) {
+        return;
+    }
     isPlayerMoving = true;
     player.rotate(r);
 }
 
 void Maze::walk(float w){
+    if (gameIsFinished) {
+        return;
+    }
     isPlayerMoving = true;
     const float hitboxSize = 0.3;
     float newX = player.getPosX() + w * std::cos(player.getRotation());
