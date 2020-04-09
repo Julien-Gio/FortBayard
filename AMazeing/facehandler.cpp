@@ -157,7 +157,7 @@ void FaceHandler::updateC(Rect& face) {
         maze->walk(WALK_SPEED);
     }
 
-    if (dir.x == 0 && dir.y != 1) {
+    if (dir.x == 0 && dir.y != -1) {
         maze->idle();
     }
 
