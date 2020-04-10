@@ -31,7 +31,6 @@ public slots:
 
 signals:
     void openMenu();
-    void closeMenu();
 
 private:
     Ui::MainWindow *ui;

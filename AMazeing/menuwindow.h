@@ -2,6 +2,7 @@
 #define MENUWINDOW_H
 
 #include <QMainWindow>
+#include <QCloseEvent>
 
 #include "mainwindow.h"
 /*
@@ -30,9 +31,10 @@ public:
     explicit MenuWindow(QWidget *parent = nullptr);
     ~MenuWindow();
 
+    void closeEvent(QCloseEvent* event);
+
 public slots:
     void openMenu();  // Réouvre la fenêtre de menu
-    void closeMenu();  // Ferme la fenêtre de menu
 
 private slots:
     /* Rôle : lance une partie */

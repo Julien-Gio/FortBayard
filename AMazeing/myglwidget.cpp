@@ -118,6 +118,7 @@ void MyGLWidget::keyPressEvent(QKeyEvent * event)
     {
         // Sortie de l'application
         case Qt::Key_Escape:
+            std::cout << "esc" << std::endl;
             emit goToMainMenu();
 
             break;

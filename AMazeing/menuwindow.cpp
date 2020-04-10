@@ -18,27 +18,27 @@ MenuWindow::~MenuWindow() {
     if (mw != NULL) {
         delete mw;
     }
+    std::cout << "deleteMenu" << std::endl;
 }
+
+
+void MenuWindow::closeEvent(QCloseEvent* event) {
+    std::cout << "closeMenu" << std::endl;
+    event->accept();
+}
+
 
 void MenuWindow::on_StartBtn_clicked() {
     mw = new MainWindow(camera);
     mw->show();
     connect(mw, SIGNAL(openMenu()), this, SLOT(openMenu()));
-    connect(mw, SIGNAL(closeMenu()), this, SLOT(closeMenu()));
     hide();
 }
 
 
 void MenuWindow::openMenu() {
+    std::cout << "openMenu" << std::endl;
     show();
-    mw->close();
-    mw = NULL;
-}
-
-
-void MenuWindow::closeMenu() {
-    if (isHidden())
-        close();
 }
 
 

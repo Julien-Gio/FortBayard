@@ -19,13 +19,15 @@ MainWindow::MainWindow(bool playWithCamera, QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+    std::cout << "deleteMain" << std::endl;
+
 }
 
 
 void MainWindow::closeEvent(QCloseEvent *event) {
-
-    emit closeMenu();
+    std::cout << "mainclose"<< std::endl;
     event->accept();
+    emit openMenu();
 }
 
 
@@ -39,5 +41,6 @@ void MainWindow::setImageLbl(QImage& img) {
 
 // Slots
 void MainWindow::goToMainMenu() {
-    emit openMenu();
+    std::cout << "goToMainMenu"<< std::endl;
+    close();
 }
