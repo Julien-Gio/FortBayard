@@ -3,13 +3,13 @@
 
 FaceHandler::FaceHandler(Maze* maze_) :
     cap(0) {
-    std::cout << "===================================" << std::endl;
-    std::cout << "          START OF PROGRAM         " << std::endl;
-    std::cout << "===================================" << std::endl;
-    std::cout << "D to toggle debugging graphics." << std::endl;
-    std::cout << "Escape to quit." << std::endl << std::endl;
-    std::cout << "Frame width :" << cap.get(CAP_PROP_FRAME_WIDTH) << std::endl;
-    std::cout << "Frame height :" << cap.get(CAP_PROP_FRAME_HEIGHT) << std::endl;
+//    std::cout << "===================================" << std::endl;
+//    std::cout << "          START OF PROGRAM         " << std::endl;
+//    std::cout << "===================================" << std::endl;
+//    std::cout << "D to toggle debugging graphics." << std::endl;
+//    std::cout << "Escape to quit." << std::endl << std::endl;
+//    std::cout << "Frame width :" << cap.get(CAP_PROP_FRAME_WIDTH) << std::endl;
+//    std::cout << "Frame height :" << cap.get(CAP_PROP_FRAME_HEIGHT) << std::endl;
 
     cap.set(CAP_PROP_FRAME_WIDTH, frameWidth);
     cap.set(CAP_PROP_FRAME_HEIGHT, frameHeight);
@@ -106,7 +106,7 @@ void FaceHandler::update() {
         }
 
 
-        this_thread::sleep_for(chrono::milliseconds(40));
+        this_thread::sleep_for(chrono::milliseconds(50));
     }
 }
 

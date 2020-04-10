@@ -30,15 +30,15 @@ void MenuWindow::on_StartBtn_clicked() {
 
 
 void MenuWindow::openMenu() {
-    mw->close();
-    delete mw;
-    mw = NULL;
     show();
+    mw->close();
+    mw = NULL;
 }
 
 
 void MenuWindow::closeMenu() {
-    close();
+    if (isHidden())
+        close();
 }
 
 

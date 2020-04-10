@@ -23,6 +23,7 @@ MainWindow::~MainWindow()
 
 
 void MainWindow::closeEvent(QCloseEvent *event) {
+
     emit closeMenu();
     event->accept();
 }
@@ -38,7 +39,5 @@ void MainWindow::setImageLbl(QImage& img) {
 
 // Slots
 void MainWindow::goToMainMenu() {
-//    MenuWindow* mw = new MenuWindow();
-//    mw->show();
     emit openMenu();
 }

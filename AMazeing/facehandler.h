@@ -32,8 +32,8 @@ class FaceHandler {
     const int GAUCHE = 3;
     const float SEUILS[4] = {3.0, 2.0, 2.0, 2.0};  // Dans l'ordre : Haut, droite, bas, gauche
 
-    const float ROTATION_SPEED = 0.01;
-    const float WALK_SPEED = 0.05;
+    const float ROTATION_SPEED = 0.015;
+    const float WALK_SPEED = 0.1;
 
     const int frameWidth = 320;
     const int frameHeight = 240;
@@ -43,7 +43,7 @@ class FaceHandler {
     const float templateOffsetY = 0.05;  // Percentage of face. < 0 above center, > 0 below center
 
 
-    const unsigned int NUM_AVG_OVER_FRAMES = 12;  // Nombre de frames du visage en mémoire pour trouver la moyenne
+    const unsigned int NUM_AVG_OVER_FRAMES = 10;  // Nombre de frames du visage en mémoire pour trouver la moyenne
 
     /* MACHINE D'ETAT :
      * 'C' : continously detecting faces
